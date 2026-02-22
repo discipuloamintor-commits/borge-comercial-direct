@@ -1,14 +1,56 @@
 import { useParams, Link } from "react-router-dom";
 import { ChevronRight, MessageCircle, CheckCircle, Truck, Shield, Star } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import ProductCard from "@/components/ProductCard";
-import { getProductBySlug, getProductsByCategory, formatPrice, getWhatsAppLink } from "@/data/products";
+import { formatPrice, getWhatsAppLink } from "@/data/products";
 
 const ProductDetail = () => {
   const { slug } = useParams<{ slug: string }>();
-  const product = getProductBySlug(slug || "");
+
+  const { data: product, isLoading } = useQuery({
+    queryKey: ["product", slug],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("*, categories(name, slug)")
+        .eq("slug", slug!)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!slug,
+  });
+
+  const { data: related = [] } = useQuery({
+    queryKey: ["related-products", product?.category_id, product?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("category_id", product!.category_id!)
+        .neq("id", product!.id)
+        .limit(4);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!product?.category_id,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -25,67 +67,65 @@ const ProductDetail = () => {
     );
   }
 
-  const related = getProductsByCategory(product.categorySlug).filter(p => p.id !== product.id).slice(0, 4);
+  const categoryName = (product as any).categories?.name ?? "";
+  const categorySlug = (product as any).categories?.slug ?? "";
 
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1">
         <div className="container mx-auto px-4 py-6">
-          {/* Breadcrumbs */}
           <nav className="flex items-center gap-1 text-sm text-muted-foreground mb-6 flex-wrap">
             <Link to="/" className="hover:text-primary transition-colors">Início</Link>
             <ChevronRight className="h-3.5 w-3.5" />
             <Link to="/produtos" className="hover:text-primary transition-colors">Produtos</Link>
             <ChevronRight className="h-3.5 w-3.5" />
-            <Link to={`/produtos?categoria=${product.categorySlug}`} className="hover:text-primary transition-colors">{product.category}</Link>
+            <Link to={`/produtos?categoria=${categorySlug}`} className="hover:text-primary transition-colors">{categoryName}</Link>
             <ChevronRight className="h-3.5 w-3.5" />
             <span className="text-foreground font-medium">{product.name}</span>
           </nav>
 
           <div className="grid md:grid-cols-2 gap-8 mb-12">
-            {/* Image */}
             <div className="aspect-square rounded-lg bg-secondary flex items-center justify-center overflow-hidden border border-border">
-              <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+              <img src={product.image || "/placeholder.svg"} alt={product.name} className="w-full h-full object-cover" />
             </div>
 
-            {/* Info */}
             <div className="space-y-6">
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">{product.name}</h1>
                 <div className="flex items-center gap-4">
-                  <span className="inline-flex items-center gap-1.5 text-sm text-primary font-medium">
-                    <CheckCircle className="h-4 w-4" /> Disponível
-                  </span>
+                  {product.available && (
+                    <span className="inline-flex items-center gap-1.5 text-sm text-primary font-medium">
+                      <CheckCircle className="h-4 w-4" /> Disponível
+                    </span>
+                  )}
                   <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
                     <Truck className="h-4 w-4" /> {product.delivery}
                   </span>
                 </div>
               </div>
 
-              <p className="text-3xl font-extrabold text-foreground">{formatPrice(product.price)}</p>
-
+              <p className="text-3xl font-extrabold text-foreground">{formatPrice(Number(product.price))}</p>
               <p className="text-muted-foreground leading-relaxed">{product.description}</p>
 
-              {/* Benefits */}
-              <div>
-                <h2 className="font-semibold text-foreground mb-3">Vantagens</h2>
-                <ul className="space-y-2">
-                  {product.benefits.map((b, i) => (
-                    <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Star className="h-3.5 w-3.5 text-primary flex-shrink-0" /> {b}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {product.benefits && product.benefits.length > 0 && (
+                <div>
+                  <h2 className="font-semibold text-foreground mb-3">Vantagens</h2>
+                  <ul className="space-y-2">
+                    {product.benefits.map((b: string, i: number) => (
+                      <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Star className="h-3.5 w-3.5 text-primary flex-shrink-0" /> {b}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
-              {/* Guarantee */}
               <div className="flex items-center gap-2 p-3 rounded-md bg-secondary text-sm text-muted-foreground">
                 <Shield className="h-5 w-5 text-primary flex-shrink-0" />
                 Compra segura com atendimento personalizado. Satisfação garantida.
               </div>
 
-              {/* CTA */}
               <a
                 href={getWhatsAppLink(product.name)}
                 target="_blank"
@@ -98,12 +138,11 @@ const ProductDetail = () => {
             </div>
           </div>
 
-          {/* Related Products */}
           {related.length > 0 && (
             <section>
               <h2 className="text-xl font-bold text-foreground mb-6">Produtos Relacionados</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {related.map(p => (
+                {related.map((p: any) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
               </div>

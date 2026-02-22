@@ -1,10 +1,25 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import { getFeaturedProducts } from "@/data/products";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import ProductCard from "./ProductCard";
 
 const FeaturedProducts = () => {
-  const featured = getFeaturedProducts();
+  const { data: featured = [] } = useQuery({
+    queryKey: ["featured-products"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("featured", true)
+        .eq("available", true)
+        .order("name");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  if (featured.length === 0) return null;
 
   return (
     <section className="py-12 md:py-16 bg-secondary">

@@ -1,11 +1,12 @@
 import { useMemo } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import ProductCard from "@/components/ProductCard";
-import { products, categories } from "@/data/products";
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -13,20 +14,38 @@ const Products = () => {
   const query = searchParams.get("q") || "";
   const sort = searchParams.get("ordem") || "";
 
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("categories").select("*").order("name");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: products = [] } = useQuery({
+    queryKey: ["products"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("products").select("*, categories(name, slug)").order("name");
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const filtered = useMemo(() => {
     let result = [...products];
-    if (categorySlug) result = result.filter(p => p.categorySlug === categorySlug);
+    if (categorySlug) result = result.filter((p: any) => p.categories?.slug === categorySlug);
     if (query) {
       const q = query.toLowerCase();
-      result = result.filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q));
+      result = result.filter((p: any) => p.name.toLowerCase().includes(q) || (p.categories?.name ?? "").toLowerCase().includes(q));
     }
-    if (sort === "preco-asc") result.sort((a, b) => a.price - b.price);
-    else if (sort === "preco-desc") result.sort((a, b) => b.price - a.price);
+    if (sort === "preco-asc") result.sort((a, b) => Number(a.price) - Number(b.price));
+    else if (sort === "preco-desc") result.sort((a, b) => Number(b.price) - Number(a.price));
     else if (sort === "nome") result.sort((a, b) => a.name.localeCompare(b.name));
     return result;
-  }, [categorySlug, query, sort]);
+  }, [categorySlug, query, sort, products]);
 
-  const activeCategory = categories.find(c => c.slug === categorySlug);
+  const activeCategory = categories.find((c: any) => c.slug === categorySlug);
 
   const setParam = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams);
@@ -40,7 +59,6 @@ const Products = () => {
       <Header />
       <main className="flex-1">
         <div className="container mx-auto px-4 py-6">
-          {/* Breadcrumbs */}
           <nav className="flex items-center gap-1 text-sm text-muted-foreground mb-6">
             <Link to="/" className="hover:text-primary transition-colors">Início</Link>
             <ChevronRight className="h-3.5 w-3.5" />
@@ -59,7 +77,6 @@ const Products = () => {
             {activeCategory ? activeCategory.name : query ? `Resultados para "${query}"` : "Todos os Produtos"}
           </h1>
 
-          {/* Filters */}
           <div className="flex flex-wrap gap-2 mb-6">
             <button
               onClick={() => setParam("categoria", "")}
@@ -67,7 +84,7 @@ const Products = () => {
             >
               Todos
             </button>
-            {categories.map(cat => (
+            {categories.map((cat: any) => (
               <button
                 key={cat.slug}
                 onClick={() => setParam("categoria", cat.slug)}
@@ -78,7 +95,6 @@ const Products = () => {
             ))}
           </div>
 
-          {/* Sort */}
           <div className="flex items-center gap-2 mb-6">
             <span className="text-sm text-muted-foreground">Ordenar:</span>
             <select
@@ -93,10 +109,9 @@ const Products = () => {
             </select>
           </div>
 
-          {/* Products Grid */}
           {filtered.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {filtered.map(product => (
+              {filtered.map((product: any) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
