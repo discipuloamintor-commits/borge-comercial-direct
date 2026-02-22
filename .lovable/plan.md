@@ -1,65 +1,108 @@
 
-# Borge Comercial — Loja Virtual com Pedidos via WhatsApp
+# Painel Administrativo — Borge Comercial
 
-## Visão Geral
-Loja virtual profissional, mobile-first, focada em produtos alimentares e de higiene/limpeza, com finalização de pedidos exclusivamente via WhatsApp. Design moderno e minimalista com verde escuro, preto e branco.
-
----
-
-## 1. Identidade Visual e Design System
-- Paleta: verde escuro (#1B5E20), preto, branco, com botões em verde forte (#2E7D32)
-- Tipografia moderna e limpa (Inter ou similar)
-- Ícones minimalistas com Lucide
-- Layout mobile-first com espaçamento generoso
-
-## 2. Página Inicial (Alta Conversão)
-- **Hero Banner** com headline forte, subtítulo de benefício, botão "Ver Produtos" e botão "Falar no WhatsApp"
-- **Categorias** com cards visuais (ex: Alimentos Básicos, Bebidas, Higiene, Limpeza, Bebê)
-- **Produtos em Destaque** em grid moderno com imagem, nome, preço e botão rápido de WhatsApp
-- **Seção de Diferenciais** com ícones: Entrega Rápida, Atendimento WhatsApp, Produtos Selecionados, Suporte Personalizado
-- **Prova Social** com depoimentos e avaliações com estrelas
-- **Footer** com informações de contato, links úteis e redes sociais
-
-## 3. Página de Catálogo / Categoria
-- Filtro por categoria
-- Grid de produtos responsivo
-- Ordenação por preço e nome
-- Pesquisa simples por nome de produto
-
-## 4. Página de Produto (Alta Conversão)
-- Imagem grande do produto
-- Nome (H1), preço destacado, selo de disponibilidade
-- Descrição focada em benefícios + lista de vantagens
-- Informações de entrega e garantia
-- **Botão principal verde**: "Encomendar pelo WhatsApp" → abre WhatsApp com mensagem pré-preenchida: *"Olá Borge Comercial, gostaria de encomendar o produto [NOME]. Pode confirmar disponibilidade e prazo de entrega?"*
-- Produtos relacionados na mesma categoria
-
-## 5. Botão Flutuante do WhatsApp
-- Fixo no canto inferior direito em todas as páginas
-- Animação sutil para chamar atenção
-- Abre conversa direta no WhatsApp
-
-## 6. Produtos de Exemplo
-- ~15-20 produtos distribuídos em 5 categorias:
-  - **Alimentos Básicos**: Arroz, Feijão, Óleo, Açúcar, Farinha
-  - **Bebidas**: Água, Sumo, Refrigerante
-  - **Higiene Pessoal**: Sabonete, Pasta de dentes, Fraldas
-  - **Limpeza**: Sabão, Detergente, Papel higiénico
-  - **Outros**: Produtos variados
-- Imagens placeholder, preços fictícios
-
-## 7. Estrutura de Navegação
-- Header com logo, menu de categorias e ícone de pesquisa
-- Menu mobile com hamburger menu
-- Breadcrumbs nas páginas internas
-- Footer completo
-
-## 8. Otimização SEO
-- Tags semânticas (H1, H2, meta descriptions)
-- Estrutura de URLs limpa (/produtos/arroz-5kg)
-- Textos alt nas imagens
-- Preparação para blog futuro (rota reservada)
+## Resumo
+Criar um painel administrativo completo com autenticação, acessível apenas pelo administrador (borgesmariano92@gmail.com), para gerir categorias, produtos e configurações da loja. Os produtos e categorias passarão de dados estáticos para a base de dados.
 
 ---
 
-**Nota técnica**: Os produtos começarão definidos no código (dados estáticos). Futuramente poderá ser adicionado um painel administrativo com backend (Lovable Cloud + Supabase) para gestão dinâmica de produtos e categorias.
+## 1. Base de Dados (Migrações SQL)
+
+Criar as seguintes tabelas e estruturas:
+
+- **Enum `app_role`** com valor `admin`
+- **Tabela `user_roles`** — associa utilizadores a roles (admin), com RLS e função `has_role()` para verificação segura
+- **Tabela `categories`** — id, name, slug, image (emoji ou URL), description, created_at
+- **Tabela `products`** — id, slug, name, price, category_id (FK para categories), image, description, benefits (array text), available, featured, delivery, created_at, updated_at
+
+Politicas RLS:
+- Leitura pública (SELECT) para categorias e produtos (loja pública)
+- INSERT/UPDATE/DELETE apenas para admin (via `has_role()`)
+
+Depois da migração, inserir:
+- O utilizador borgesmariano92@gmail.com via `supabase.auth.admin.createUser` (edge function)
+- A role `admin` na tabela `user_roles`
+- As 5 categorias e 18 produtos existentes migrados para as novas tabelas
+
+---
+
+## 2. Edge Function — Criar Utilizador Admin
+
+Uma edge function `create-admin` será criada para:
+- Criar o utilizador com email borgesmariano92@gmail.com e senha provisória 123456
+- Inserir a role admin na tabela `user_roles`
+- Será executada uma única vez para configuração inicial
+
+---
+
+## 3. Páginas do Painel Admin
+
+### Login (`/admin`)
+- Formulário simples de email + senha
+- Redireciona para `/admin/dashboard` após login
+- Verifica se o utilizador tem role `admin`
+
+### Dashboard (`/admin/dashboard`)
+- Visão geral: total de produtos, categorias, produtos em destaque
+- Links rápidos para gestão
+
+### Gestão de Categorias (`/admin/categorias`)
+- Lista de categorias com opções de editar/eliminar
+- Formulário para criar/editar categoria (nome, slug, imagem, descrição)
+
+### Gestão de Produtos (`/admin/produtos`)
+- Tabela com todos os produtos, filtro por categoria
+- Formulário para criar/editar produto com todos os campos
+- Upload de imagem do produto (usando storage)
+
+### Alterar Senha (`/admin/perfil`)
+- Formulário para alterar a senha actual
+
+---
+
+## 4. Actualização da Loja Pública
+
+- Os componentes da loja (ProductCard, FeaturedProducts, Products, ProductDetail, CategoriesSection) serão actualizados para buscar dados da base de dados em vez dos dados estáticos
+- Usar React Query para cache e carregamento eficiente
+- O ficheiro `src/data/products.ts` será mantido apenas como fallback/referência
+
+---
+
+## 5. Storage
+
+- Criar bucket `product-images` para armazenar imagens dos produtos
+- Política pública de leitura, escrita apenas para admin
+
+---
+
+## Detalhes Técnicos
+
+### Estrutura de rotas
+```text
+/admin          -> Login
+/admin/dashboard -> Dashboard (protegida)
+/admin/categorias -> Gestão de categorias (protegida)
+/admin/produtos   -> Gestão de produtos (protegida)
+/admin/perfil     -> Alterar senha (protegida)
+```
+
+### Componentes a criar
+```text
+src/pages/admin/AdminLogin.tsx
+src/pages/admin/AdminDashboard.tsx
+src/pages/admin/AdminCategories.tsx
+src/pages/admin/AdminProducts.tsx
+src/pages/admin/AdminProfile.tsx
+src/components/admin/AdminLayout.tsx      (sidebar + header)
+src/components/admin/AdminRoute.tsx       (protecção de rota)
+src/components/admin/CategoryForm.tsx
+src/components/admin/ProductForm.tsx
+src/hooks/useAdmin.tsx                    (verificação de role)
+```
+
+### Sequência de implementação
+1. Migração SQL (tabelas, RLS, função has_role)
+2. Edge function para criar admin + seed de dados
+3. Storage bucket para imagens
+4. Componentes admin (login, layout, dashboard, CRUD)
+5. Actualizar loja pública para ler da base de dados
