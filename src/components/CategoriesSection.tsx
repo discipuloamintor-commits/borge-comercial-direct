@@ -1,7 +1,17 @@
 import { Link } from "react-router-dom";
-import { categories } from "@/data/products";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const CategoriesSection = () => {
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("categories").select("*").order("name");
+      if (error) throw error;
+      return data;
+    },
+  });
+
   return (
     <section className="py-12 md:py-16">
       <div className="container mx-auto px-4">
