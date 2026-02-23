@@ -43,7 +43,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           </Link>
 
           {/* Wholesale badging */}
-          <div className="mt-2 flex items-center gap-2">
+          <div className="mt-2 flex flex-wrap items-center gap-1.5">
             {product.available && (
               <div className="inline-flex items-center gap-1 text-[11px] font-bold tracking-wider uppercase text-green-700 bg-green-500/10 px-2 py-0.5 rounded-full">
                 <CheckCircle className="h-3 w-3" />
