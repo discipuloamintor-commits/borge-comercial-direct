@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import ProductCard from "@/components/ProductCard";
 import { formatPrice, getWhatsAppLink } from "@/data/products";
+import PriceTag from "@/components/PriceTag";
 
 const ProductDetail = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -154,7 +155,9 @@ const ProductDetail = () => {
                 </div>
               </div>
 
-              <p className="text-3xl font-extrabold text-foreground">{formatPrice(Number(product.price))}</p>
+              <div className="my-2">
+                <PriceTag price={Number(product.price)} size="xl" />
+              </div>
               <p className="text-muted-foreground leading-relaxed">{product.description}</p>
 
               {product.benefits && product.benefits.length > 0 && (
@@ -175,15 +178,13 @@ const ProductDetail = () => {
                 Compra segura com atendimento personalizado. Satisfação garantida.
               </div>
 
-              <a
-                href={getWhatsAppLink(product.name)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full h-14 rounded-lg bg-primary text-primary-foreground font-bold text-base hover:bg-accent transition-colors"
+              <Link
+                to={`/encomendar?produto=${product.slug}`}
+                className="flex items-center justify-center gap-2 w-full h-14 rounded-lg bg-primary text-primary-foreground font-bold text-base hover:bg-accent transition-colors shadow-premium"
               >
-                <MessageCircle className="h-5 w-5" />
-                Encomendar pelo WhatsApp
-              </a>
+                <CheckCircle className="h-5 w-5" />
+                Adicionar e Encomendar
+              </Link>
             </div>
           </div>
 

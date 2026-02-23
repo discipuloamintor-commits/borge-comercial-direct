@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { ShoppingCart, Trash2, Plus, Minus, CalendarDays, User, Phone, MapPin, Send, Package } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -14,6 +15,9 @@ interface OrderItem {
 }
 
 const Encomendar = () => {
+    const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
+
     const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<string>("todos");
     const [customerName, setCustomerName] = useState("");
@@ -78,11 +82,29 @@ const Encomendar = () => {
         return orderItems.find(item => item.productId === productId)?.quantity || 0;
     };
 
-    // Calculate total
     const totalPrice = orderItems.reduce((sum, item) => {
         const product = products.find(p => p.id === item.productId);
         return sum + (product ? product.price * item.quantity : 0);
     }, 0);
+
+    const totalItemsCount = orderItems.reduce((sum, item) => sum + item.quantity, 0);
+    const hasDelivery = totalPrice >= 25000;
+    const canSubmitOrder = totalItemsCount >= 10;
+
+    // Handle auto-add from URL parameter
+    useEffect(() => {
+        const productSlug = searchParams.get("produto");
+        if (productSlug && products.length > 0) {
+            const product = products.find(p => p.slug === productSlug);
+            if (product && !orderItems.some(i => i.productId === product.id)) {
+                // Auto add to cart with 0 logic, meaning user has to click +, or set initial qty to 10. Let's set 1 to start
+                setOrderItems([{ productId: product.id, quantity: 1 }]);
+
+                // Clear the param so it doesn't run again on reload 
+                navigate("/encomendar", { replace: true });
+            }
+        }
+    }, [searchParams, products, navigate, orderItems]);
 
     // Format delivery period
     const periodLabels: Record<string, string> = {
@@ -100,15 +122,21 @@ const Encomendar = () => {
         lines.push("👤 *Dados do Cliente:*");
         lines.push(`• Nome: ${customerName}`);
         lines.push(`• Telefone: ${customerPhone}`);
-        lines.push(`• Endereço: ${customerAddress}`);
-        lines.push("");
-        lines.push("📅 *Entrega Agendada:*");
-        if (deliveryDate) {
-            const date = new Date(deliveryDate + "T12:00:00");
-            const formatted = date.toLocaleDateString("pt-MZ", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
-            lines.push(`• Data: ${formatted}`);
+        if (hasDelivery) {
+            lines.push(`• Morada: ${customerAddress}`);
+            lines.push("");
+            lines.push("📅 *Entrega Agendada:*");
+            if (deliveryDate) {
+                const date = new Date(deliveryDate + "T12:00:00");
+                const formatted = date.toLocaleDateString("pt-MZ", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+                lines.push(`• Data: ${formatted}`);
+            }
+            lines.push(`• Período: ${periodLabels[deliveryPeriod]}`);
+        } else {
+            lines.push("");
+            lines.push("📍 *Método de Receção:* Levantamento na Loja (Praça dos Combatentes - Mercado Xiquelene)");
         }
-        lines.push(`• Período: ${periodLabels[deliveryPeriod]}`);
+
         lines.push("");
         lines.push("🛒 *Produtos:*");
         lines.push("─────────────────────");
@@ -123,6 +151,9 @@ const Encomendar = () => {
 
         lines.push("─────────────────────");
         lines.push(`💰 *TOTAL: ${formatPrice(totalPrice)}*`);
+        if (!hasDelivery) {
+            lines.push("⚠️ _(As entregas estão incluídas apenas em encomendas superiores a 25.000 MT)_");
+        }
 
         if (notes.trim()) {
             lines.push("");
@@ -132,12 +163,13 @@ const Encomendar = () => {
 
         lines.push("");
         lines.push("━━━━━━━━━━━━━━━━━━━━");
-        lines.push("_Enviado pelo site Borge Comercial_");
+        lines.push("_Enviado pelo formulário de Grosso do site Borge Comercial_");
 
         return lines.join("\n");
     };
 
-    const canSubmit = orderItems.length > 0 && customerName.trim() && customerPhone.trim() && customerAddress.trim() && deliveryDate;
+    const isFormValid = customerName.trim() && customerPhone.trim() && (!hasDelivery || (customerAddress.trim() && deliveryDate));
+    const canSubmit = orderItems.length > 0 && isFormValid && canSubmitOrder;
 
     const handleSubmit = () => {
         if (!canSubmit) return;
@@ -298,9 +330,25 @@ const Encomendar = () => {
                                         </div>
                                     )}
                                     {orderItems.length > 0 && (
-                                        <div className="border-t border-border pt-4 flex justify-between items-center">
-                                            <span className="font-semibold text-foreground">Total:</span>
-                                            <span className="text-xl font-extrabold text-primary">{formatPrice(totalPrice)}</span>
+                                        <div className="border-t border-border pt-4 mt-2">
+                                            <div className="flex justify-between items-center mb-1">
+                                                <span className="font-medium text-muted-foreground text-sm">Quantidade Total:</span>
+                                                <span className={`font-bold ${totalItemsCount < 10 ? "text-red-500" : "text-foreground"}`}>{totalItemsCount} unid.</span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="font-semibold text-foreground text-lg">Total Encomenda:</span>
+                                                <span className="text-xl font-extrabold text-primary">{formatPrice(totalPrice)}</span>
+                                            </div>
+                                            {!hasDelivery && (
+                                                <p className="text-xs text-amber-600 mt-2 p-2 bg-amber-500/10 rounded border border-amber-500/20">
+                                                    <strong>Atenção:</strong> Venda inferior a 25.000 MT.<br />Deverá ser levantada na Loja (não inclui transporte).
+                                                </p>
+                                            )}
+                                            {totalItemsCount > 0 && totalItemsCount < 10 && (
+                                                <p className="text-xs text-destructive mt-2 p-2 bg-destructive/10 rounded border border-destructive/20 font-medium">
+                                                    A venda por grosso requer um mínimo de 10 unidades no total do carrinho.
+                                                </p>
+                                            )}
                                         </div>
                                     )}
                                 </div>
@@ -337,57 +385,74 @@ const Encomendar = () => {
                                             />
                                         </div>
                                     </div>
-                                    <div>
-                                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Endereço de entrega *</label>
-                                        <div className="relative">
-                                            <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                                            <textarea
-                                                value={customerAddress}
-                                                onChange={e => setCustomerAddress(e.target.value)}
-                                                placeholder="Ex: Av. Julius Nyerere, nº 123, Maputo"
-                                                rows={2}
-                                                className="w-full pl-10 pr-4 py-3 rounded-xl border border-border/50 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all resize-none"
-                                            />
-                                        </div>
-                                    </div>
+                                    {hasDelivery ? (
+                                        <>
+                                            <div>
+                                                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Endereço de entrega *</label>
+                                                <div className="relative">
+                                                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                                    <textarea
+                                                        value={customerAddress}
+                                                        onChange={e => setCustomerAddress(e.target.value)}
+                                                        placeholder="Ex: Av. Julius Nyerere, nº 123, Maputo"
+                                                        rows={2}
+                                                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-border/50 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all resize-none"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="p-4 rounded-xl bg-orange-50 border border-orange-200">
+                                            <h4 className="font-bold text-orange-800 text-sm mb-1 flex items-center gap-1.5">
+                                                <MapPin className="h-4 w-4" /> Levantamento Físico
+                                            </h4>
+                                            <p className="text-sm text-orange-700">
+                                                A sua encomenda não atinge o valor mínimo de <strong>25.000 MT</strong> para entrega gratuita. Por favor, desloque-se à <strong>Praça dos Combatentes - Mercado Xiquelene, Maputo</strong> para realizar o levantamento físico dos produtos.
+                                            </p>    </div>
+                                    )}
                                 </div>
 
                                 {/* Delivery Scheduling */}
-                                <div className="rounded-2xl border border-border/50 bg-card shadow-premium p-6 space-y-4">
-                                    <h3 className="font-bold text-foreground flex items-center gap-2">
-                                        <CalendarDays className="h-4 w-4 text-primary" />
-                                        3. Agendar Entrega
-                                    </h3>
-                                    <div>
-                                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Data de entrega *</label>
-                                        <input
-                                            type="date"
-                                            value={deliveryDate}
-                                            onChange={e => setDeliveryDate(e.target.value)}
-                                            min={minDate}
-                                            className="w-full h-11 px-4 rounded-xl border border-border/50 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Período preferido</label>
-                                        <div className="grid grid-cols-3 gap-2">
-                                            {Object.entries(periodLabels).map(([key, label]) => (
-                                                <button
-                                                    key={key}
-                                                    onClick={() => setDeliveryPeriod(key)}
-                                                    className={`py-2.5 rounded-xl text-xs font-semibold transition-all ${deliveryPeriod === key ? "bg-primary text-primary-foreground shadow-green" : "bg-muted text-muted-foreground hover:bg-primary/10"}`}
-                                                >
-                                                    {label.split(" ")[0]}
-                                                </button>
-                                            ))}
+                                {hasDelivery && (
+                                    <div className="rounded-2xl border border-border/50 bg-card shadow-premium p-6 space-y-4">
+                                        <h3 className="font-bold text-foreground flex items-center gap-2">
+                                            <CalendarDays className="h-4 w-4 text-primary" />
+                                            3. Agendar Entrega
+                                        </h3>
+                                        <div>
+                                            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Data de entrega *</label>
+                                            <input
+                                                type="date"
+                                                value={deliveryDate}
+                                                onChange={e => setDeliveryDate(e.target.value)}
+                                                min={minDate}
+                                                className="w-full h-11 px-4 rounded-xl border border-border/50 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Período preferido</label>
+                                            <div className="grid grid-cols-3 gap-2">
+                                                {Object.entries(periodLabels).map(([key, label]) => (
+                                                    <button
+                                                        key={key}
+                                                        onClick={() => setDeliveryPeriod(key)}
+                                                        className={`py-2.5 rounded-xl text-xs font-semibold transition-all ${deliveryPeriod === key ? "bg-primary text-primary-foreground shadow-green" : "bg-muted text-muted-foreground hover:bg-primary/10"}`}
+                                                    >
+                                                        {label.split(" ")[0]}
+                                                    </button>
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
+                                )}
+
+                                <div className="rounded-2xl border border-border/50 bg-card shadow-premium p-6 space-y-4">
                                     <div>
                                         <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Observações (opcional)</label>
                                         <textarea
                                             value={notes}
                                             onChange={e => setNotes(e.target.value)}
-                                            placeholder="Ex: Entregar no portão lateral, tocar a campainha..."
+                                            placeholder={hasDelivery ? "Ex: Entregar no portão lateral..." : "Instruções sobre o dia ou forma de levantamento..."}
                                             rows={2}
                                             className="w-full px-4 py-3 rounded-xl border border-border/50 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all resize-none"
                                         />

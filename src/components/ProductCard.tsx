@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { MessageCircle, CheckCircle, Eye } from "lucide-react";
 import { formatPrice, getWhatsAppLink } from "@/data/products";
+import PriceTag from "./PriceTag";
 
 interface ProductCardProps {
   product: {
@@ -58,21 +59,19 @@ const ProductCard = ({ product }: ProductCardProps) => {
         <div className="mt-auto pt-3 border-t border-border/70 flex flex-col gap-2">
           <div>
             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">A partir de</span>
-            <p className="text-xl md:text-2xl font-black text-foreground tracking-tight leading-none mt-0.5">
-              {formatPrice(product.price)}
-            </p>
+            <div className="mt-1">
+              <PriceTag price={product.price} size="md" />
+            </div>
           </div>
 
-          <a
-            href={getWhatsAppLink(product.name)}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            to={`/encomendar?produto=${product.slug}`}
             className="w-full flex items-center justify-center h-11 rounded-xl bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all group/btn font-bold text-sm"
-            title="Cotar via WhatsApp"
+            title="Adicionar à Encomenda"
           >
             <MessageCircle className="h-5 w-5 mr-2" />
-            <span>Cotar Fardo / Caixa</span>
-          </a>
+            <span>Encomendar (Grosso)</span>
+          </Link>
         </div>
       </div>
     </div>
