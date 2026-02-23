@@ -2,6 +2,7 @@ import { ShieldCheck, Truck, MessageCircle, Users, Target, Heart } from "lucide-
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import { Helmet } from "react-helmet-async";
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 import { getWhatsAppLink } from "@/data/products";
 
@@ -18,8 +19,19 @@ const About = () => {
     const { ref: valuesRef, isVisible: valuesVisible } = useScrollAnimation();
     const { ref: ctaRef, isVisible: ctaVisible } = useScrollAnimation();
 
+    const canonicalUrl = "https://www.borgescomercial.com/sobre";
+
     return (
         <div className="min-h-screen flex flex-col">
+            <Helmet>
+                <title>Sobre Nós — Borge Comercial</title>
+                <meta name="description" content="A Borge Comercial nasceu com uma missão simples: levar produtos essenciais de qualidade às famílias moçambicanas, com preços justos e excelente atendimento." />
+                <link rel="canonical" href={canonicalUrl} />
+                <meta property="og:title" content="Sobre Nós — Borge Comercial" />
+                <meta property="og:description" content="Missão de levar produtos essenciais de qualidade às famílias moçambicanas." />
+                <meta property="og:url" content={canonicalUrl} />
+                <meta property="og:image" content="https://www.borgescomercial.com/borgecomerciallogo.pnj.png" />
+            </Helmet>
             <Header />
             <main className="flex-1">
                 {/* Hero */}
@@ -53,7 +65,7 @@ const About = () => {
                             <p className="text-muted-foreground leading-relaxed">
                                 Com entrega rápida e atendimento personalizado via WhatsApp, tornamos a compra fácil e conveniente. Basta escolher, encomendar e receber — sem complicações.
                             </p>
-                            <div className="grid grid-cols-3 gap-4 pt-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
                                 <div className="text-center p-4 rounded-lg bg-secondary">
                                     <p className="text-2xl font-extrabold text-primary">500+</p>
                                     <p className="text-xs text-muted-foreground mt-1">Clientes Satisfeitos</p>

@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { ChevronRight, MessageCircle, CheckCircle, Truck, Shield, Star } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Helmet } from "react-helmet-async";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -70,8 +71,56 @@ const ProductDetail = () => {
   const categoryName = (product as any).categories?.name ?? "";
   const categorySlug = (product as any).categories?.slug ?? "";
 
+  const canonicalUrl = `https://www.borgescomercial.com/produto/${product.slug}`;
+  const imageUrl = product.image?.startsWith("http")
+    ? product.image
+    : product.image
+      ? `https://www.borgescomercial.com${product.image}`
+      : `https://www.borgescomercial.com/placeholder.svg`;
+
+  const structuredData = {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": product.name,
+    "image": [imageUrl],
+    "description": product.description,
+    "brand": {
+      "@type": "Brand",
+      "name": "Borges Comercial"
+    },
+    "offers": {
+      "@type": "Offer",
+      "url": canonicalUrl,
+      "priceCurrency": "MZN",
+      "price": product.price,
+      "availability": product.available ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      "seller": {
+        "@type": "Organization",
+        "name": "Borges Comercial"
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
+      <Helmet>
+        <title>{product.name} — Borge Comercial</title>
+        <meta name="description" content={product.description?.substring(0, 160)} />
+        <link rel="canonical" href={canonicalUrl} />
+
+        <meta property="og:title" content={`${product.name} — Borge Comercial`} />
+        <meta property="og:description" content={product.description?.substring(0, 160)} />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:image" content={imageUrl} />
+
+        <meta name="twitter:title" content={`${product.name} — Borge Comercial`} />
+        <meta name="twitter:description" content={product.description?.substring(0, 160)} />
+        <meta name="twitter:image" content={imageUrl} />
+
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
+      </Helmet>
       <Header />
       <main className="flex-1">
         <div className="container mx-auto px-4 py-6">

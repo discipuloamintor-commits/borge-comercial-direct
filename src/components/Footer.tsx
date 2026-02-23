@@ -1,30 +1,36 @@
 import { Link } from "react-router-dom";
-import { ShoppingBag, Phone, Mail, MapPin } from "lucide-react";
+import { Phone, Mail, MapPin } from "lucide-react";
 import { categories, WHATSAPP_NUMBER } from "@/data/products";
 
 const Footer = () => {
   return (
-    <footer className="bg-foreground text-background">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer className="relative bg-gradient-to-b from-gray-900 to-gray-950 text-white overflow-hidden">
+      {/* Logo-colored top glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-red-500/40 to-transparent" />
+
+      <div className="container mx-auto px-4 py-14">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           {/* Brand */}
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <ShoppingBag className="h-6 w-6" />
-              <span className="text-lg font-bold">Borge Comercial</span>
+            <div className="mb-5">
+              <img src="/borgecomerciallogo.pnj.png" alt="Borge Comercial" className="h-14 w-auto object-contain brightness-0 invert" />
             </div>
-            <p className="text-sm opacity-70">
+            <p className="text-sm text-gray-400 leading-relaxed">
               A sua loja de confiança para produtos alimentares, higiene e limpeza. Encomende pelo WhatsApp!
             </p>
           </div>
 
           {/* Categories */}
           <div>
-            <h3 className="font-semibold mb-4 text-sm uppercase tracking-wider">Categorias</h3>
-            <ul className="space-y-2">
+            <h3 className="font-bold mb-5 text-sm uppercase tracking-widest text-gray-300">Categorias</h3>
+            <ul className="space-y-3">
               {categories.map(cat => (
                 <li key={cat.slug}>
-                  <Link to={`/produtos?categoria=${cat.slug}`} className="text-sm opacity-70 hover:opacity-100 transition-opacity">
+                  <Link
+                    to={`/produtos?categoria=${cat.slug}`}
+                    className="text-sm text-gray-400 hover:text-yellow-400 transition-colors inline-flex items-center gap-2 group"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-gray-600 group-hover:bg-yellow-400 transition-colors" />
                     {cat.name}
                   </Link>
                 </li>
@@ -34,32 +40,68 @@ const Footer = () => {
 
           {/* Links */}
           <div>
-            <h3 className="font-semibold mb-4 text-sm uppercase tracking-wider">Links Úteis</h3>
-            <ul className="space-y-2">
-              <li><Link to="/" className="text-sm opacity-70 hover:opacity-100 transition-opacity">Início</Link></li>
-              <li><Link to="/produtos" className="text-sm opacity-70 hover:opacity-100 transition-opacity">Produtos</Link></li>
+            <h3 className="font-bold mb-5 text-sm uppercase tracking-widest text-gray-300">Links Úteis</h3>
+            <ul className="space-y-3">
+              <li>
+                <Link to="/" className="text-sm text-gray-400 hover:text-yellow-400 transition-colors inline-flex items-center gap-2 group">
+                  <span className="w-1.5 h-1.5 rounded-full bg-gray-600 group-hover:bg-yellow-400 transition-colors" />
+                  Início
+                </Link>
+              </li>
+              <li>
+                <Link to="/produtos" className="text-sm text-gray-400 hover:text-yellow-400 transition-colors inline-flex items-center gap-2 group">
+                  <span className="w-1.5 h-1.5 rounded-full bg-gray-600 group-hover:bg-yellow-400 transition-colors" />
+                  Produtos
+                </Link>
+              </li>
+              <li>
+                <Link to="/sobre" className="text-sm text-gray-400 hover:text-yellow-400 transition-colors inline-flex items-center gap-2 group">
+                  <span className="w-1.5 h-1.5 rounded-full bg-gray-600 group-hover:bg-yellow-400 transition-colors" />
+                  Sobre Nós
+                </Link>
+              </li>
+              <li>
+                <Link to="/contacto" className="text-sm text-gray-400 hover:text-yellow-400 transition-colors inline-flex items-center gap-2 group">
+                  <span className="w-1.5 h-1.5 rounded-full bg-gray-600 group-hover:bg-yellow-400 transition-colors" />
+                  Contactos
+                </Link>
+              </li>
             </ul>
           </div>
 
           {/* Contact */}
           <div>
-            <h3 className="font-semibold mb-4 text-sm uppercase tracking-wider">Contacto</h3>
-            <ul className="space-y-3">
-              <li className="flex items-center gap-2 text-sm opacity-70">
-                <Phone className="h-4 w-4" /> +{WHATSAPP_NUMBER}
+            <h3 className="font-bold mb-5 text-sm uppercase tracking-widest text-gray-300">Contacto</h3>
+            <ul className="space-y-4">
+              <li className="flex items-center gap-3 text-sm text-gray-400">
+                <div className="w-9 h-9 rounded-xl bg-gray-800 flex items-center justify-center flex-shrink-0">
+                  <Phone className="h-4 w-4 text-yellow-400" />
+                </div>
+                +{WHATSAPP_NUMBER}
               </li>
-              <li className="flex items-center gap-2 text-sm opacity-70">
-                <Mail className="h-4 w-4" /> info@borgecomercial.com
+              <li className="flex items-center gap-3 text-sm text-gray-400">
+                <div className="w-9 h-9 rounded-xl bg-gray-800 flex items-center justify-center flex-shrink-0">
+                  <Mail className="h-4 w-4 text-yellow-400" />
+                </div>
+                borgesmariano92@gmail.com
               </li>
-              <li className="flex items-center gap-2 text-sm opacity-70">
-                <MapPin className="h-4 w-4" /> Luanda, Angola
+              <li className="flex items-center gap-3 text-sm text-gray-400">
+                <div className="w-9 h-9 rounded-xl bg-gray-800 flex items-center justify-center flex-shrink-0">
+                  <MapPin className="h-4 w-4 text-yellow-400" />
+                </div>
+                Maputo - Praca dos combatentes - Mercado xiquelene
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="border-t border-background/20 mt-10 pt-6 text-center">
-          <p className="text-sm opacity-50">© {new Date().getFullYear()} Borge Comercial. Todos os direitos reservados.</p>
+        <div className="mt-12 pt-6 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-sm text-gray-500 text-center md:text-left">
+            © {new Date().getFullYear()} Borge Comercial. Todos os direitos reservados.
+          </p>
+          <p className="text-sm text-gray-500 text-center md:text-right">
+            Desenvolvido por <a href="http://www.lgtecserv.com" target="_blank" rel="noopener noreferrer" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">LG TecServ</a>
+          </p>
         </div>
       </div>
     </footer>

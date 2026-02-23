@@ -4,14 +4,62 @@ import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 import { WHATSAPP_NUMBER, getWhatsAppLink } from "@/data/products";
-
+import { Helmet } from "react-helmet-async";
 const Contact = () => {
     const { ref: heroRef, isVisible: heroVisible } = useScrollAnimation();
     const { ref: infoRef, isVisible: infoVisible } = useScrollAnimation();
     const { ref: mapRef, isVisible: mapVisible } = useScrollAnimation();
 
+    const canonicalUrl = "https://www.borgescomercial.com/contacto";
+
+    const localBusinessSchema = {
+        "@context": "https://schema.org",
+        "@type": "GroceryStore",
+        "name": "Borge Comercial",
+        "image": "https://www.borgescomercial.com/borgecomerciallogo.pnj.png",
+        "@id": canonicalUrl,
+        "url": canonicalUrl,
+        "telephone": `+${WHATSAPP_NUMBER}`,
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Mercado do Xipamanine",
+            "addressLocality": "Maputo",
+            "addressRegion": "Kampu Fumo",
+            "addressCountry": "MZ"
+        },
+        "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": "-25.9526",
+            "longitude": "32.5595"
+        },
+        "openingHoursSpecification": [
+            {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+                "opens": "07:00",
+                "closes": "18:00"
+            }
+        ],
+        "sameAs": [
+            "https://www.borgescomercial.com"
+        ]
+    };
+
     return (
         <div className="min-h-screen flex flex-col">
+            <Helmet>
+                <title>Contactos — Borge Comercial</title>
+                <meta name="description" content="Entre em contacto com a Borge Comercial via WhatsApp, telefone ou e-mail. Visite a nossa loja no Mercado do Xipamanine, em Maputo." />
+                <link rel="canonical" href={canonicalUrl} />
+
+                <meta property="og:title" content="Contactos — Borge Comercial" />
+                <meta property="og:description" content="Entre em contacto com a Borge Comercial via WhatsApp, telefone ou e-mail." />
+                <meta property="og:url" content={canonicalUrl} />
+
+                <script type="application/ld+json">
+                    {JSON.stringify(localBusinessSchema)}
+                </script>
+            </Helmet>
             <Header />
             <main className="flex-1">
                 {/* Hero */}

@@ -3,7 +3,9 @@ import { ShoppingCart, Trash2, Plus, Minus, CalendarDays, User, Phone, MapPin, S
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import { products, categories, formatPrice, WHATSAPP_NUMBER } from "@/data/products";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { formatPrice, WHATSAPP_NUMBER } from "@/data/products";
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 
 interface OrderItem {
@@ -24,6 +26,26 @@ const Encomendar = () => {
     const { ref: heroRef, isVisible: heroVisible } = useScrollAnimation();
     const { ref: formRef, isVisible: formVisible } = useScrollAnimation();
 
+    const { data: categories = [] } = useQuery({
+        queryKey: ["categories"],
+        queryFn: async () => {
+            const { data, error } = await supabase.from("categories").select("*").order("name");
+            if (error) throw error;
+            return data;
+        },
+        staleTime: 5 * 60 * 1000,
+    });
+
+    const { data: products = [], isLoading } = useQuery({
+        queryKey: ["products"],
+        queryFn: async () => {
+            const { data, error } = await supabase.from("products").select("*, categories(name, slug)").order("name");
+            if (error) throw error;
+            return data;
+        },
+        staleTime: 5 * 60 * 1000,
+    });
+
     // Get the minimum date (tomorrow)
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -32,7 +54,7 @@ const Encomendar = () => {
     // Filter products by category
     const filteredProducts = selectedCategory === "todos"
         ? products
-        : products.filter(p => p.categorySlug === selectedCategory);
+        : products.filter((p: any) => p.categories?.slug === selectedCategory);
 
     // Add or update item quantity
     const updateItem = (productId: string, delta: number) => {
@@ -182,44 +204,64 @@ const Encomendar = () => {
                             </div>
 
                             {/* Product Grid */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                {filteredProducts.map(product => {
-                                    const qty = getItemQuantity(product.id);
-                                    return (
-                                        <div
-                                            key={product.id}
-                                            className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${qty > 0 ? "border-primary/30 bg-primary/5 shadow-sm" : "border-border/50 bg-card hover:border-border"}`}
-                                        >
-                                            <div className="w-16 h-16 rounded-xl bg-secondary flex-shrink-0 overflow-hidden">
-                                                <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="font-semibold text-sm text-foreground truncate">{product.name}</p>
-                                                <p className="text-sm font-bold text-primary">{formatPrice(product.price)}</p>
-                                            </div>
-                                            <div className="flex items-center gap-1.5">
-                                                {qty > 0 && (
-                                                    <button
-                                                        onClick={() => updateItem(product.id, -1)}
-                                                        className="w-8 h-8 rounded-lg border border-border flex items-center justify-center hover:bg-red-50 hover:border-red-200 hover:text-red-500 transition-colors"
-                                                    >
-                                                        <Minus className="h-3.5 w-3.5" />
-                                                    </button>
-                                                )}
-                                                {qty > 0 && (
-                                                    <span className="w-8 text-center font-bold text-sm">{qty}</span>
-                                                )}
-                                                <button
-                                                    onClick={() => updateItem(product.id, 1)}
-                                                    className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center hover:bg-accent transition-colors"
-                                                >
-                                                    <Plus className="h-3.5 w-3.5" />
-                                                </button>
+                            {isLoading ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    {Array.from({ length: 6 }).map((_, i) => (
+                                        <div key={i} className="flex items-center gap-4 p-4 rounded-2xl border border-border/50 bg-card animate-pulse">
+                                            <div className="w-16 h-16 rounded-xl bg-secondary flex-shrink-0" />
+                                            <div className="flex-1 space-y-2">
+                                                <div className="h-4 bg-secondary/80 rounded block w-3/4" />
+                                                <div className="h-4 bg-secondary/80 rounded block w-1/4" />
                                             </div>
                                         </div>
-                                    );
-                                })}
-                            </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    {filteredProducts.map((product: any) => {
+                                        const qty = getItemQuantity(product.id);
+                                        return (
+                                            <div
+                                                key={product.id}
+                                                className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${qty > 0 ? "border-primary bg-primary/5 shadow-md scale-[1.01]" : "border-border/50 bg-card hover:border-primary/30 hover:shadow-premium"}`}
+                                            >
+                                                <div className="w-16 h-16 rounded-xl bg-secondary flex-shrink-0 overflow-hidden">
+                                                    <img src={product.image || "/placeholder.svg"} alt={product.name} className="w-full h-full object-cover mix-blend-multiply" loading="lazy" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="font-semibold text-sm text-foreground truncate">{product.name}</p>
+                                                    <p className="text-sm font-bold text-primary mt-0.5">{formatPrice(product.price)}</p>
+                                                    {product.available ? (
+                                                        <p className="text-[10px] text-green-600 font-bold uppercase tracking-wider mt-1">Em Estoque</p>
+                                                    ) : (
+                                                        <p className="text-[10px] text-red-600 font-bold uppercase tracking-wider mt-1">Esgotado</p>
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center gap-1.5">
+                                                    {qty > 0 && (
+                                                        <button
+                                                            onClick={() => updateItem(product.id, -1)}
+                                                            className="w-8 h-8 rounded-lg border border-primary/30 text-primary flex items-center justify-center bg-white hover:bg-primary/10 transition-colors"
+                                                        >
+                                                            <Minus className="h-3.5 w-3.5" />
+                                                        </button>
+                                                    )}
+                                                    {qty > 0 && (
+                                                        <span className="w-7 text-center font-bold text-sm text-foreground">{qty}</span>
+                                                    )}
+                                                    <button
+                                                        onClick={() => updateItem(product.id, 1)}
+                                                        disabled={!product.available}
+                                                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${!product.available ? "bg-muted text-muted-foreground opacity-50 cursor-not-allowed" : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"}`}
+                                                    >
+                                                        <Plus className="h-3.5 w-3.5" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
                         </div>
 
                         {/* Right: Order Summary + Customer Info */}
@@ -357,8 +399,8 @@ const Encomendar = () => {
                                     onClick={handleSubmit}
                                     disabled={!canSubmit}
                                     className={`w-full h-14 rounded-2xl font-bold text-base flex items-center justify-center gap-2.5 transition-all duration-300 ${canSubmit
-                                            ? "bg-[#25D366] text-white hover:bg-[#20BD5A] hover:scale-[1.02] shadow-lg cursor-pointer"
-                                            : "bg-muted text-muted-foreground cursor-not-allowed"
+                                        ? "bg-[#25D366] text-white hover:bg-[#20BD5A] hover:scale-[1.02] shadow-lg cursor-pointer"
+                                        : "bg-muted text-muted-foreground cursor-not-allowed"
                                         }`}
                                 >
                                     <Send className="h-5 w-5" />

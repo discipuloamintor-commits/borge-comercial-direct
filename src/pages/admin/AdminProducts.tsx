@@ -145,7 +145,7 @@ export default function AdminProducts() {
     ? products
     : products.filter((p: any) => p.category_id === filterCategory);
 
-  const formatPrice = (price: number) => price.toLocaleString("pt-AO") + " Kz";
+  const formatPrice = (price: number) => price.toLocaleString("pt-MZ") + " MT";
 
   return (
     <AdminLayout>

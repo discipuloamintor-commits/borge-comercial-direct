@@ -20,7 +20,7 @@ export interface Category {
   description: string;
 }
 
-export const WHATSAPP_NUMBER = "244999999999";
+export const WHATSAPP_NUMBER = "258844357612";
 
 export const categories: Category[] = [
   { name: "Alimentos Básicos", slug: "alimentos-basicos", image: "🍚", description: "Arroz, feijão, óleo e mais" },
@@ -159,7 +159,7 @@ export function getFeaturedProducts(): Product[] {
 }
 
 export function formatPrice(price: number): string {
-  return price.toLocaleString("pt-AO") + " Kz";
+  return price.toLocaleString("pt-MZ") + " MT";
 }
 
 export function getWhatsAppLink(productName?: string): string {
