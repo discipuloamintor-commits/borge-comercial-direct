@@ -255,16 +255,16 @@ export default function AdminProducts() {
       {isLoading ? (
         <p className="text-muted-foreground">A carregar...</p>
       ) : (
-        <div className="rounded-md border overflow-x-auto">
+        <div className="rounded-md border">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Nome</TableHead>
-                <TableHead>Categoria</TableHead>
+                <TableHead className="hidden md:table-cell">Categoria</TableHead>
                 <TableHead>Preço</TableHead>
-                <TableHead>Tipo de Venda</TableHead>
-                <TableHead>Destaque</TableHead>
-                <TableHead>Disponível</TableHead>
+                <TableHead className="hidden sm:table-cell">Tipo Venda</TableHead>
+                <TableHead className="hidden sm:table-cell">Destaque</TableHead>
+                <TableHead className="hidden sm:table-cell">Disponível</TableHead>
                 <TableHead className="text-right">Acções</TableHead>
               </TableRow>
             </TableHeader>
@@ -272,11 +272,11 @@ export default function AdminProducts() {
               {filtered.map((p: any) => (
                 <TableRow key={p.id}>
                   <TableCell className="font-medium">{p.name}</TableCell>
-                  <TableCell>{(p as any).categories?.name ?? "—"}</TableCell>
+                  <TableCell className="hidden md:table-cell">{(p as any).categories?.name ?? "—"}</TableCell>
                   <TableCell>{formatPrice(p.price)}</TableCell>
-                  <TableCell className="capitalize">{p.sales_type || "Grosso"}</TableCell>
-                  <TableCell>{p.featured ? "⭐" : "—"}</TableCell>
-                  <TableCell>{p.available ? "✅" : "❌"}</TableCell>
+                  <TableCell className="capitalize hidden sm:table-cell">{p.sales_type || "Grosso"}</TableCell>
+                  <TableCell className="hidden sm:table-cell">{p.featured ? "⭐" : "—"}</TableCell>
+                  <TableCell className="hidden sm:table-cell">{p.available ? "✅" : "❌"}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
                       <Button variant="outline" size="icon" onClick={() => openEdit(p)}>
