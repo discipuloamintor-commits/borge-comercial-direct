@@ -12,6 +12,7 @@ import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 interface OrderItem {
     productId: string;
     quantity: number;
+    saleType: 'grosso' | 'unidade';
 }
 
 const Encomendar = () => {
@@ -61,50 +62,54 @@ const Encomendar = () => {
         : products.filter((p: any) => p.categories?.slug === selectedCategory);
 
     // Add or update item quantity
-    const updateItem = (productId: string, delta: number) => {
+    const updateItem = (productId: string, delta: number, saleType: 'grosso' | 'unidade' = 'grosso') => {
         setOrderItems(prev => {
-            const existing = prev.find(item => item.productId === productId);
+            const existing = prev.find(item => item.productId === productId && item.saleType === saleType);
             if (existing) {
                 const newQty = existing.quantity + delta;
-                if (newQty <= 0) return prev.filter(item => item.productId !== productId);
-                return prev.map(item => item.productId === productId ? { ...item, quantity: newQty } : item);
+                if (newQty <= 0) return prev.filter(item => !(item.productId === productId && item.saleType === saleType));
+                return prev.map(item => item.productId === productId && item.saleType === saleType ? { ...item, quantity: newQty } : item);
             }
-            if (delta > 0) return [...prev, { productId, quantity: delta }];
+            if (delta > 0) return [...prev, { productId, quantity: delta, saleType }];
             return prev;
         });
     };
 
-    const removeItem = (productId: string) => {
-        setOrderItems(prev => prev.filter(item => item.productId !== productId));
+    const removeItem = (productId: string, saleType: 'grosso' | 'unidade') => {
+        setOrderItems(prev => prev.filter(item => !(item.productId === productId && item.saleType === saleType)));
     };
 
-    const getItemQuantity = (productId: string) => {
-        return orderItems.find(item => item.productId === productId)?.quantity || 0;
+    const getItemQuantity = (productId: string, saleType: 'grosso' | 'unidade' = 'grosso') => {
+        return orderItems.find(item => item.productId === productId && item.saleType === saleType)?.quantity || 0;
     };
 
     const totalPrice = orderItems.reduce((sum, item) => {
         const product = products.find(p => p.id === item.productId);
-        return sum + (product ? product.price * item.quantity : 0);
+        if (!product) return sum;
+        const price = item.saleType === 'unidade' && product.price_unit ? product.price_unit : product.price;
+        return sum + (price * item.quantity);
     }, 0);
 
     const totalItemsCount = orderItems.reduce((sum, item) => sum + item.quantity, 0);
+    const hasGrossoItems = orderItems.some(i => i.saleType === 'grosso');
+    const grossoItemsCount = orderItems.filter(i => i.saleType === 'grosso').reduce((sum, item) => sum + item.quantity, 0);
     const hasDelivery = totalPrice >= 25000;
-    const canSubmitOrder = totalItemsCount >= 10;
+    const canSubmitOrder = !hasGrossoItems || grossoItemsCount >= 10;
 
     // Handle auto-add from URL parameter
     useEffect(() => {
         const productSlug = searchParams.get("produto");
         if (productSlug && products.length > 0) {
-            const product = products.find(p => p.slug === productSlug);
-            if (product && !orderItems.some(i => i.productId === product.id)) {
-                // Auto add to cart with 0 logic, meaning user has to click +, or set initial qty to 10. Let's set 1 to start
-                setOrderItems([{ productId: product.id, quantity: 1 }]);
-
-                // Clear the param so it doesn't run again on reload 
-                navigate("/encomendar", { replace: true });
+            const product = products.find((p: any) => p.slug === productSlug);
+            if (product) {
+                const saleType = product.sales_type === 'unidade' ? 'unidade' : 'grosso';
+                if (!orderItems.some(i => i.productId === product.id && i.saleType === saleType)) {
+                    setOrderItems([{ productId: product.id, quantity: 1, saleType }]);
+                    navigate("/encomendar", { replace: true });
+                }
             }
         }
-    }, [searchParams, products, navigate, orderItems]);
+    }, [searchParams, products, navigate]);
 
     // Format delivery period
     const periodLabels: Record<string, string> = {
@@ -144,8 +149,12 @@ const Encomendar = () => {
         orderItems.forEach((item, index) => {
             const product = products.find(p => p.id === item.productId);
             if (product) {
-                lines.push(`${index + 1}. ${product.name}`);
-                lines.push(`   Qtd: ${item.quantity} × ${formatPrice(product.price)} = *${formatPrice(product.price * item.quantity)}*`);
+                const isUnit = item.saleType === 'unidade' && product.price_unit;
+                const price = isUnit ? product.price_unit : product.price;
+                const typeLabel = product.sales_type === 'ambos' ? (isUnit ? " (Unidade)" : " (Grosso)") : "";
+
+                lines.push(`${index + 1}. ${product.name}${typeLabel}`);
+                lines.push(`   Qtd: ${item.quantity} × ${formatPrice(price)} = *${formatPrice(price * item.quantity)}*`);
             }
         });
 
@@ -251,43 +260,65 @@ const Encomendar = () => {
                             ) : (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     {filteredProducts.map((product: any) => {
-                                        const qty = getItemQuantity(product.id);
+                                        const qtyGrosso = getItemQuantity(product.id, 'grosso');
+                                        const qtyUnidade = getItemQuantity(product.id, 'unidade');
+                                        const totalQty = qtyGrosso + qtyUnidade;
+
                                         return (
                                             <div
                                                 key={product.id}
-                                                className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${qty > 0 ? "border-primary bg-primary/5 shadow-md scale-[1.01]" : "border-border/50 bg-card hover:border-primary/30 hover:shadow-premium"}`}
+                                                className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${totalQty > 0 ? "border-primary bg-primary/5 shadow-md scale-[1.01]" : "border-border/50 bg-card hover:border-primary/30 hover:shadow-premium"}`}
                                             >
                                                 <div className="w-16 h-16 rounded-xl bg-secondary flex-shrink-0 overflow-hidden">
                                                     <img src={product.image || "/placeholder.svg"} alt={product.name} className="w-full h-full object-cover mix-blend-multiply" loading="lazy" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className="font-semibold text-sm text-foreground truncate">{product.name}</p>
-                                                    <p className="text-sm font-bold text-primary mt-0.5">{formatPrice(product.price)}</p>
+                                                    {product.sales_type === 'ambos' && product.price_unit ? (
+                                                        <div className="mt-1 space-y-0.5">
+                                                            <p className="text-xs text-muted-foreground"><span className="font-medium text-foreground">Grosso:</span> {formatPrice(product.price)}</p>
+                                                            <p className="text-xs text-muted-foreground"><span className="font-medium text-foreground">Unid:</span> {formatPrice(product.price_unit)}</p>
+                                                        </div>
+                                                    ) : (
+                                                        <p className="text-sm font-bold text-primary mt-0.5">
+                                                            {formatPrice(product.sales_type === 'unidade' && product.price_unit ? product.price_unit : product.price)}
+                                                        </p>
+                                                    )}
                                                     {product.available ? (
                                                         <p className="text-[10px] text-green-600 font-bold uppercase tracking-wider mt-1">Em Estoque</p>
                                                     ) : (
                                                         <p className="text-[10px] text-red-600 font-bold uppercase tracking-wider mt-1">Esgotado</p>
                                                     )}
                                                 </div>
-                                                <div className="flex items-center gap-1.5">
-                                                    {qty > 0 && (
-                                                        <button
-                                                            onClick={() => updateItem(product.id, -1)}
-                                                            className="w-8 h-8 rounded-lg border border-primary/30 text-primary flex items-center justify-center bg-white hover:bg-primary/10 transition-colors"
-                                                        >
-                                                            <Minus className="h-3.5 w-3.5" />
-                                                        </button>
+                                                <div className="flex flex-col gap-2 items-end">
+                                                    {(product.sales_type === 'grosso' || product.sales_type === 'ambos') && (
+                                                        <div className="flex items-center gap-1.5" title="Adicionar Caixa/Grosso">
+                                                            {product.sales_type === 'ambos' && <span className="text-[10px] text-muted-foreground uppercase font-bold mr-1">GROSSO</span>}
+                                                            {qtyGrosso > 0 && (
+                                                                <button onClick={() => updateItem(product.id, -1, 'grosso')} className="w-7 h-7 rounded-md border border-primary/30 text-primary flex items-center justify-center bg-white hover:bg-primary/10 transition-colors">
+                                                                    <Minus className="h-3.5 w-3.5" />
+                                                                </button>
+                                                            )}
+                                                            {qtyGrosso > 0 && <span className="w-5 text-center font-bold text-xs text-foreground">{qtyGrosso}</span>}
+                                                            <button onClick={() => updateItem(product.id, 1, 'grosso')} disabled={!product.available} className={`w-7 h-7 rounded-md flex items-center justify-center transition-colors ${!product.available ? "bg-muted text-muted-foreground opacity-50 cursor-not-allowed" : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"}`}>
+                                                                <Plus className="h-3.5 w-3.5" />
+                                                            </button>
+                                                        </div>
                                                     )}
-                                                    {qty > 0 && (
-                                                        <span className="w-7 text-center font-bold text-sm text-foreground">{qty}</span>
+                                                    {(product.sales_type === 'unidade' || product.sales_type === 'ambos') && (
+                                                        <div className="flex items-center gap-1.5" title="Adicionar Unidade">
+                                                            {product.sales_type === 'ambos' && <span className="text-[10px] text-muted-foreground uppercase font-bold mr-1">UNID.</span>}
+                                                            {qtyUnidade > 0 && (
+                                                                <button onClick={() => updateItem(product.id, -1, 'unidade')} className="w-7 h-7 rounded-md border border-primary/30 text-primary flex items-center justify-center bg-white hover:bg-primary/10 transition-colors">
+                                                                    <Minus className="h-3.5 w-3.5" />
+                                                                </button>
+                                                            )}
+                                                            {qtyUnidade > 0 && <span className="w-5 text-center font-bold text-xs text-foreground">{qtyUnidade}</span>}
+                                                            <button onClick={() => updateItem(product.id, 1, 'unidade')} disabled={!product.available} className={`w-7 h-7 rounded-md flex items-center justify-center transition-colors ${!product.available ? "bg-muted text-muted-foreground opacity-50 cursor-not-allowed" : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"}`}>
+                                                                <Plus className="h-3.5 w-3.5" />
+                                                            </button>
+                                                        </div>
                                                     )}
-                                                    <button
-                                                        onClick={() => updateItem(product.id, 1)}
-                                                        disabled={!product.available}
-                                                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${!product.available ? "bg-muted text-muted-foreground opacity-50 cursor-not-allowed" : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"}`}
-                                                    >
-                                                        <Plus className="h-3.5 w-3.5" />
-                                                    </button>
                                                 </div>
                                             </div>
                                         );
@@ -314,14 +345,17 @@ const Encomendar = () => {
                                             {orderItems.map(item => {
                                                 const product = products.find(p => p.id === item.productId);
                                                 if (!product) return null;
+                                                const isUnit = item.saleType === 'unidade' && product.price_unit;
+                                                const price = isUnit ? product.price_unit : product.price;
+                                                const typeLabel = product.sales_type === 'ambos' ? (isUnit ? " (Unid.)" : " (Grosso)") : "";
                                                 return (
-                                                    <div key={item.productId} className="flex items-center justify-between gap-2">
+                                                    <div key={`${item.productId}-${item.saleType}`} className="flex items-center justify-between gap-2">
                                                         <div className="flex-1 min-w-0">
-                                                            <p className="text-sm font-medium text-foreground truncate">{product.name}</p>
-                                                            <p className="text-xs text-muted-foreground">{item.quantity} × {formatPrice(product.price)}</p>
+                                                            <p className="text-sm font-medium text-foreground truncate">{product.name}{typeLabel}</p>
+                                                            <p className="text-xs text-muted-foreground">{item.quantity} × {formatPrice(price)}</p>
                                                         </div>
-                                                        <p className="text-sm font-bold text-foreground whitespace-nowrap">{formatPrice(product.price * item.quantity)}</p>
-                                                        <button onClick={() => removeItem(item.productId)} className="p-1 text-muted-foreground hover:text-red-500 transition-colors">
+                                                        <p className="text-sm font-bold text-foreground whitespace-nowrap">{formatPrice(price * item.quantity)}</p>
+                                                        <button onClick={() => removeItem(item.productId, item.saleType)} className="p-1 text-muted-foreground hover:text-red-500 transition-colors">
                                                             <Trash2 className="h-3.5 w-3.5" />
                                                         </button>
                                                     </div>
@@ -344,9 +378,9 @@ const Encomendar = () => {
                                                     <strong>Atenção:</strong> Venda inferior a 25.000 MT.<br />Deverá ser levantada na Loja (não inclui transporte).
                                                 </p>
                                             )}
-                                            {totalItemsCount > 0 && totalItemsCount < 10 && (
+                                            {hasGrossoItems && grossoItemsCount > 0 && grossoItemsCount < 10 && (
                                                 <p className="text-xs text-destructive mt-2 p-2 bg-destructive/10 rounded border border-destructive/20 font-medium">
-                                                    A venda por grosso requer um mínimo de 10 unidades no total do carrinho.
+                                                    A venda por grosso requer um mínimo de 10 unidades no total da componente grossista.
                                                 </p>
                                             )}
                                         </div>

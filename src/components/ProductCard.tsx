@@ -11,6 +11,7 @@ interface ProductCardProps {
     image: string | null;
     available: boolean;
     sales_type?: string;
+    price_unit?: number | null;
   };
 }
 
@@ -55,12 +56,27 @@ const ProductCard = ({ product }: ProductCardProps) => {
         </div>
 
         <div className="mt-auto pt-3 border-t border-border/70 flex flex-col gap-2">
-          <div>
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">A partir de</span>
-            <div className="mt-1">
-              <PriceTag price={product.price} size="md" />
+          {product.sales_type === 'ambos' && product.price_unit ? (
+            <div className="flex flex-col gap-1">
+              <div className="flex items-end justify-between">
+                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Unidade</span>
+                <PriceTag price={product.price_unit} size="sm" />
+              </div>
+              <div className="flex items-end justify-between">
+                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Grosso</span>
+                <PriceTag price={product.price} size="sm" />
+              </div>
             </div>
-          </div>
+          ) : (
+            <div>
+              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                {product.sales_type === 'unidade' ? 'Preço' : 'Preço Grosso'}
+              </span>
+              <div className="mt-1">
+                <PriceTag price={product.sales_type === 'unidade' && product.price_unit ? product.price_unit : product.price} size="md" />
+              </div>
+            </div>
+          )}
 
           <Link
             to={`/encomendar?produto=${product.slug}`}

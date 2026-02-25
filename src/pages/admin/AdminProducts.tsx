@@ -17,6 +17,7 @@ interface ProductForm {
   name: string;
   slug: string;
   price: number;
+  price_unit: number | null;
   category_id: string;
   image: string;
   description: string;
@@ -28,7 +29,7 @@ interface ProductForm {
 }
 
 const emptyForm: ProductForm = {
-  name: "", slug: "", price: 0, category_id: "", image: "/placeholder.svg",
+  name: "", slug: "", price: 0, price_unit: null, category_id: "", image: "/placeholder.svg",
   description: "", benefits: "", available: true, featured: false, delivery: "Entrega em 24-48h",
   sales_type: "grosso",
 };
@@ -79,6 +80,7 @@ export default function AdminProducts() {
         name: form.name,
         slug: form.slug,
         price: form.price,
+        price_unit: form.price_unit,
         category_id: form.category_id || null,
         image: imageUrl,
         description: form.description,
@@ -125,7 +127,7 @@ export default function AdminProducts() {
   const openEdit = (p: any) => {
     setEditId(p.id);
     setForm({
-      name: p.name, slug: p.slug, price: p.price,
+      name: p.name, slug: p.slug, price: p.price, price_unit: p.price_unit ?? null,
       category_id: p.category_id ?? "", image: p.image ?? "/placeholder.svg",
       description: p.description ?? "", benefits: (p.benefits ?? []).join("\n"),
       available: p.available, featured: p.featured, delivery: p.delivery ?? "",
@@ -192,38 +194,54 @@ export default function AdminProducts() {
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Preço (Kz)</Label>
-                    <Input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: Number(e.target.value) })} required min={0} />
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Preço Grosso (MZN)</Label>
+                      <Input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: Number(e.target.value) })} required min={0} />
+                    </div>
+                    {form.sales_type !== 'grosso' && (
+                      <div className="space-y-2">
+                        <Label>Preço Unidade (MZN)</Label>
+                        <Input type="number" value={form.price_unit || 0} onChange={(e) => setForm({ ...form, price_unit: Number(e.target.value) })} required min={0} />
+                      </div>
+                    )}
                   </div>
-                  <div className="space-y-2">
-                    <Label>Categoria</Label>
-                    <Select value={form.category_id} onValueChange={(v) => setForm({ ...form, category_id: v })}>
-                      <SelectTrigger><SelectValue placeholder="Selecionar" /></SelectTrigger>
-                      <SelectContent>
-                        {categories.map((c: any) => (
-                          <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Categoria</Label>
+                      <Select value={form.category_id} onValueChange={(v) => setForm({ ...form, category_id: v })}>
+                        <SelectTrigger><SelectValue placeholder="Selecionar" /></SelectTrigger>
+                        <SelectContent>
+                          {categories.map((c: any) => (
+                            <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Tipo de Venda</Label>
+                      <Select value={form.sales_type} onValueChange={(v) => setForm({ ...form, sales_type: v })}>
+                        <SelectTrigger><SelectValue placeholder="Selecionar" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="grosso">Grosso</SelectItem>
+                          <SelectItem value="unidade">Unidade</SelectItem>
+                          <SelectItem value="ambos">Ambos</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label>Tipo de Venda</Label>
-                    <Select value={form.sales_type} onValueChange={(v) => setForm({ ...form, sales_type: v })}>
-                      <SelectTrigger><SelectValue placeholder="Selecionar" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="grosso">Grosso</SelectItem>
-                        <SelectItem value="unidade">Unidade</SelectItem>
-                        <SelectItem value="ambos">Ambos</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Imagem do produto</Label>
                     <Input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files?.[0] ?? null)} />
                     {form.image && form.image !== "/placeholder.svg" && (
                       <p className="text-xs text-muted-foreground truncate">Actual: {form.image}</p>
                     )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Prazo de entrega</Label>
+                    <Input value={form.delivery} onChange={(e) => setForm({ ...form, delivery: e.target.value })} maxLength={100} />
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -233,10 +251,6 @@ export default function AdminProducts() {
                 <div className="space-y-2">
                   <Label>Benefícios (um por linha)</Label>
                   <Textarea value={form.benefits} onChange={(e) => setForm({ ...form, benefits: e.target.value })} placeholder={"Benefício 1\nBenefício 2"} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Prazo de entrega</Label>
-                  <Input value={form.delivery} onChange={(e) => setForm({ ...form, delivery: e.target.value })} maxLength={100} />
                 </div>
                 <div className="flex gap-6">
                   <div className="flex items-center gap-2">
@@ -257,47 +271,49 @@ export default function AdminProducts() {
         </div>
       </div>
 
-      {isLoading ? (
-        <p className="text-muted-foreground">A carregar...</p>
-      ) : (
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead className="hidden md:table-cell">Categoria</TableHead>
-                <TableHead>Preço</TableHead>
-                <TableHead className="hidden sm:table-cell">Tipo Venda</TableHead>
-                <TableHead className="hidden sm:table-cell">Destaque</TableHead>
-                <TableHead className="hidden sm:table-cell">Disponível</TableHead>
-                <TableHead className="text-right">Acções</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map((p: any) => (
-                <TableRow key={p.id}>
-                  <TableCell className="font-medium">{p.name}</TableCell>
-                  <TableCell className="hidden md:table-cell">{(p as any).categories?.name ?? "—"}</TableCell>
-                  <TableCell>{formatPrice(p.price)}</TableCell>
-                  <TableCell className="capitalize hidden sm:table-cell">{p.sales_type || "Grosso"}</TableCell>
-                  <TableCell className="hidden sm:table-cell">{p.featured ? "⭐" : "—"}</TableCell>
-                  <TableCell className="hidden sm:table-cell">{p.available ? "✅" : "❌"}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="outline" size="icon" onClick={() => openEdit(p)}>
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button variant="destructive" size="icon" onClick={() => deleteMutation.mutate(p.id)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
+      {
+        isLoading ? (
+          <p className="text-muted-foreground">A carregar...</p>
+        ) : (
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nome</TableHead>
+                  <TableHead className="hidden md:table-cell">Categoria</TableHead>
+                  <TableHead>Preço</TableHead>
+                  <TableHead className="hidden sm:table-cell">Tipo Venda</TableHead>
+                  <TableHead className="hidden sm:table-cell">Destaque</TableHead>
+                  <TableHead className="hidden sm:table-cell">Disponível</TableHead>
+                  <TableHead className="text-right">Acções</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      )}
-    </AdminLayout>
+              </TableHeader>
+              <TableBody>
+                {filtered.map((p: any) => (
+                  <TableRow key={p.id}>
+                    <TableCell className="font-medium">{p.name}</TableCell>
+                    <TableCell className="hidden md:table-cell">{(p as any).categories?.name ?? "—"}</TableCell>
+                    <TableCell>{formatPrice(p.price)}</TableCell>
+                    <TableCell className="capitalize hidden sm:table-cell">{p.sales_type || "Grosso"}</TableCell>
+                    <TableCell className="hidden sm:table-cell">{p.featured ? "⭐" : "—"}</TableCell>
+                    <TableCell className="hidden sm:table-cell">{p.available ? "✅" : "❌"}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button variant="outline" size="icon" onClick={() => openEdit(p)}>
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button variant="destructive" size="icon" onClick={() => deleteMutation.mutate(p.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )
+      }
+    </AdminLayout >
   );
 }

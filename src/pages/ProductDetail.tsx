@@ -155,8 +155,26 @@ const ProductDetail = () => {
                 </div>
               </div>
 
-              <div className="my-2">
-                <PriceTag price={Number(product.price)} size="xl" />
+              <div className="my-4 flex flex-col gap-4">
+                {product.sales_type === 'ambos' && product.price_unit ? (
+                  <>
+                    <div>
+                      <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider block mb-1">Preço Grosso</span>
+                      <PriceTag price={Number(product.price)} size="xl" />
+                    </div>
+                    <div className="pt-2 border-t border-border">
+                      <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider block mb-1">Preço Unidade</span>
+                      <PriceTag price={Number(product.price_unit)} size="xl" />
+                    </div>
+                  </>
+                ) : (
+                  <div>
+                    <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider block mb-1">
+                      {product.sales_type === 'unidade' ? 'Preço' : 'Preço Grosso'}
+                    </span>
+                    <PriceTag price={Number(product.sales_type === 'unidade' && product.price_unit ? product.price_unit : product.price)} size="xl" />
+                  </div>
+                )}
               </div>
               <p className="text-muted-foreground leading-relaxed">{product.description}</p>
 
