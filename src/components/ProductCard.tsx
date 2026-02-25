@@ -10,6 +10,7 @@ interface ProductCardProps {
     price: number;
     image: string | null;
     available: boolean;
+    sales_type?: string;
   };
 }
 
@@ -50,9 +51,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 <span>Em Estoque</span>
               </div>
             )}
-            <div className="inline-flex items-center gap-1 text-[11px] font-bold tracking-wider uppercase text-amber-700 bg-amber-500/10 px-2 py-0.5 rounded-full">
-              <span>Grosso</span>
-            </div>
           </div>
         </div>
 
@@ -66,11 +64,11 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
           <Link
             to={`/encomendar?produto=${product.slug}`}
-            className="w-full flex items-center justify-center h-11 rounded-xl bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all group/btn font-bold text-sm"
+            className="w-full flex items-center justify-center h-10 md:h-11 rounded-xl bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all group/btn font-bold text-[11px] md:text-sm px-1.5"
             title="Adicionar à Encomenda"
           >
-            <MessageCircle className="h-5 w-5 mr-2" />
-            <span>Encomendar (Grosso)</span>
+            <MessageCircle className="h-3.5 w-3.5 md:h-5 md:w-5 mr-1 md:mr-2 flex-shrink-0" />
+            <span className="truncate">{product.sales_type === 'unidade' ? 'Encomendar (Unid.)' : product.sales_type === 'ambos' ? 'Encomendar' : 'Encomendar (Grosso)'}</span>
           </Link>
         </div>
       </div>

@@ -21,9 +21,9 @@ const PriceTag: React.FC<PriceTagProps> = ({ price, size = 'md', className = '' 
         },
         md: {
             wrapper: "items-start",
-            main: "text-3xl leading-none",
-            cents: "text-sm mt-1",
-            currency: "text-xs mt-2 ml-1"
+            main: "text-2xl md:text-3xl leading-none",
+            cents: "text-xs md:text-sm mt-1",
+            currency: "text-[10px] md:text-xs mt-2 ml-1"
         },
         lg: {
             wrapper: "items-start",

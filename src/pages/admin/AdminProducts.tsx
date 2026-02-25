@@ -24,11 +24,13 @@ interface ProductForm {
   available: boolean;
   featured: boolean;
   delivery: string;
+  sales_type: string;
 }
 
 const emptyForm: ProductForm = {
   name: "", slug: "", price: 0, category_id: "", image: "/placeholder.svg",
   description: "", benefits: "", available: true, featured: false, delivery: "Entrega em 24-48h",
+  sales_type: "grosso",
 };
 
 export default function AdminProducts() {
@@ -84,6 +86,7 @@ export default function AdminProducts() {
         available: form.available,
         featured: form.featured,
         delivery: form.delivery,
+        sales_type: form.sales_type,
       };
 
       if (editId) {
@@ -126,6 +129,7 @@ export default function AdminProducts() {
       category_id: p.category_id ?? "", image: p.image ?? "/placeholder.svg",
       description: p.description ?? "", benefits: (p.benefits ?? []).join("\n"),
       available: p.available, featured: p.featured, delivery: p.delivery ?? "",
+      sales_type: p.sales_type ?? "grosso",
     });
     setImageFile(null);
     setOpen(true);
@@ -198,13 +202,24 @@ export default function AdminProducts() {
                       </SelectContent>
                     </Select>
                   </div>
-                </div>
-                <div className="space-y-2">
-                  <Label>Imagem do produto</Label>
-                  <Input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files?.[0] ?? null)} />
-                  {form.image && form.image !== "/placeholder.svg" && (
-                    <p className="text-xs text-muted-foreground truncate">Actual: {form.image}</p>
-                  )}
+                  <div className="space-y-2">
+                    <Label>Tipo de Venda</Label>
+                    <Select value={form.sales_type} onValueChange={(v) => setForm({ ...form, sales_type: v })}>
+                      <SelectTrigger><SelectValue placeholder="Selecionar" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="grosso">Grosso</SelectItem>
+                        <SelectItem value="unidade">Unidade</SelectItem>
+                        <SelectItem value="ambos">Ambos</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Imagem do produto</Label>
+                    <Input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files?.[0] ?? null)} />
+                    {form.image && form.image !== "/placeholder.svg" && (
+                      <p className="text-xs text-muted-foreground truncate">Actual: {form.image}</p>
+                    )}
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label>Descrição</Label>
@@ -240,13 +255,14 @@ export default function AdminProducts() {
       {isLoading ? (
         <p className="text-muted-foreground">A carregar...</p>
       ) : (
-        <div className="rounded-md border">
+        <div className="rounded-md border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Nome</TableHead>
                 <TableHead>Categoria</TableHead>
                 <TableHead>Preço</TableHead>
+                <TableHead>Tipo de Venda</TableHead>
                 <TableHead>Destaque</TableHead>
                 <TableHead>Disponível</TableHead>
                 <TableHead className="text-right">Acções</TableHead>
@@ -258,6 +274,7 @@ export default function AdminProducts() {
                   <TableCell className="font-medium">{p.name}</TableCell>
                   <TableCell>{(p as any).categories?.name ?? "—"}</TableCell>
                   <TableCell>{formatPrice(p.price)}</TableCell>
+                  <TableCell className="capitalize">{p.sales_type || "Grosso"}</TableCell>
                   <TableCell>{p.featured ? "⭐" : "—"}</TableCell>
                   <TableCell>{p.available ? "✅" : "❌"}</TableCell>
                   <TableCell className="text-right">

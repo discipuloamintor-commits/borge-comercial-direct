@@ -57,15 +57,15 @@ const Products = () => {
     setSearchParams(params);
   };
 
-  const canonicalUrl = categorySlug 
-    ? `https://www.borgescomercial.com/produtos?categoria=${categorySlug}` 
+  const canonicalUrl = categorySlug
+    ? `https://www.borgescomercial.com/produtos?categoria=${categorySlug}`
     : `https://www.borgescomercial.com/produtos`;
 
-  const pageTitle = activeCategory 
+  const pageTitle = activeCategory
     ? `${activeCategory.name} — Borge Comercial`
     : `Todos os Produtos em Grosso — Borge Comercial`;
-    
-  const pageDescription = activeCategory 
+
+  const pageDescription = activeCategory
     ? `Compre ${activeCategory.name.toLowerCase()} a grosso de forma rápida e segura na África do Sul com grandes preços.`
     : `Visualize o nosso catálogo de produtos alimentares, de higiene e limpeza. Compre a grosso via WhatsApp em Maputo.`;
 
@@ -133,7 +133,7 @@ const Products = () => {
           </div>
 
           {isLoading ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="rounded-2xl border border-border/40 bg-card overflow-hidden h-[360px] md:h-[400px] flex flex-col p-5 animate-pulse">
                   <div className="w-full aspect-[4/5] bg-secondary/60 rounded-xl mb-4" />
@@ -144,7 +144,7 @@ const Products = () => {
               ))}
             </div>
           ) : filtered.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
               {filtered.map((product: any) => (
                 <ProductCard key={product.id} product={product} />
               ))}

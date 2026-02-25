@@ -3,212 +3,232 @@
 
   <url>
     <loc>https://www.borgescomercial.com/</loc>
-    <lastmod>2026-02-23</lastmod>
+    <lastmod>2026-02-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.borgescomercial.com/produtos</loc>
-    <lastmod>2026-02-23</lastmod>
+    <lastmod>2026-02-25</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://www.borgescomercial.com/sobre</loc>
-    <lastmod>2026-02-23</lastmod>
+    <lastmod>2026-02-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://www.borgescomercial.com/contacto</loc>
-    <lastmod>2026-02-23</lastmod>
+    <lastmod>2026-02-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://www.borgescomercial.com/encomendar</loc>
-    <lastmod>2026-02-23</lastmod>
+    <lastmod>2026-02-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://www.borgescomercial.com/produto/feijao-1kg</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://www.borgescomercial.com/produto/frango-sangiro</loc>
+    <lastmod>2026-02-25</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
     <image:image>
-      <image:loc>https://www.borgescomercial.com/placeholder.svg</image:loc>
-      <image:title>Feijão Vermelho 1kg</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://www.borgescomercial.com/produto/oleo-vegetal-1l</loc>
-    <lastmod>2026-02-23</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://www.borgescomercial.com/placeholder.svg</image:loc>
-      <image:title>Óleo Vegetal 1L</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://www.borgescomercial.com/produto/farinha-trigo-1kg</loc>
-    <lastmod>2026-02-23</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://www.borgescomercial.com/placeholder.svg</image:loc>
-      <image:title>Farinha de Trigo 1kg</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://www.borgescomercial.com/produto/sumo-laranja-1l</loc>
-    <lastmod>2026-02-23</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://www.borgescomercial.com/placeholder.svg</image:loc>
-      <image:title>Sumo de Laranja 1L</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://www.borgescomercial.com/produto/refrigerante-cola-2l</loc>
-    <lastmod>2026-02-23</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://www.borgescomercial.com/placeholder.svg</image:loc>
-      <image:title>Refrigerante Cola 2L</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://www.borgescomercial.com/produto/sabonete-pack-3</loc>
-    <lastmod>2026-02-23</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://www.borgescomercial.com/placeholder.svg</image:loc>
-      <image:title>Sabonete Pack 3 unidades</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://www.borgescomercial.com/produto/pasta-dentes-100ml</loc>
-    <lastmod>2026-02-23</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://www.borgescomercial.com/placeholder.svg</image:loc>
-      <image:title>Pasta de Dentes 100ml</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://www.borgescomercial.com/produto/sabao-po-1kg</loc>
-    <lastmod>2026-02-23</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://www.borgescomercial.com/placeholder.svg</image:loc>
-      <image:title>Sabão em Pó 1kg</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://www.borgescomercial.com/produto/papel-higienico-pack-4</loc>
-    <lastmod>2026-02-23</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://www.borgescomercial.com/placeholder.svg</image:loc>
-      <image:title>Papel Higiénico Pack 4 rolos</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://www.borgescomercial.com/produto/lixivia-1l</loc>
-    <lastmod>2026-02-23</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://www.borgescomercial.com/placeholder.svg</image:loc>
-      <image:title>Lixívia 1L</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://www.borgescomercial.com/produto/fraldas-pack-30</loc>
-    <lastmod>2026-02-23</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://www.borgescomercial.com/placeholder.svg</image:loc>
-      <image:title>Fraldas Pack 30 unidades</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://www.borgescomercial.com/produto/toalhitas-bebe-pack-80</loc>
-    <lastmod>2026-02-23</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://www.borgescomercial.com/placeholder.svg</image:loc>
-      <image:title>Toalhitas Bebé Pack 80</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://www.borgescomercial.com/produto/leite-infantil-400g</loc>
-    <lastmod>2026-02-23</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://www.borgescomercial.com/placeholder.svg</image:loc>
-      <image:title>Leite Infantil 400g</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://www.borgescomercial.com/produto/acucar-1kg</loc>
-    <lastmod>2026-02-23</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://uufmcdssvghyufufpoku.supabase.co/storage/v1/object/public/product-images/1771798465357.png</image:loc>
-      <image:title>Açúcar 1kg</image:title>
+      <image:loc>https://uufmcdssvghyufufpoku.supabase.co/storage/v1/object/public/product-images/1771858543627.jpg</image:loc>
+      <image:title>Frango sangiro</image:title>
     </image:image>
   </url>
   <url>
     <loc>https://www.borgescomercial.com/produto/agua-mineral-1-5l</loc>
-    <lastmod>2026-02-23</lastmod>
+    <lastmod>2026-02-25</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
     <image:image>
-      <image:loc>https://uufmcdssvghyufufpoku.supabase.co/storage/v1/object/public/product-images/1771798534362.jpeg</image:loc>
-      <image:title>Água Mineral 1.5L</image:title>
+      <image:loc>https://uufmcdssvghyufufpoku.supabase.co/storage/v1/object/public/product-images/1771864318412.jpeg</image:loc>
+      <image:title>Água Namaacha 1.5L</image:title>
     </image:image>
   </url>
   <url>
     <loc>https://www.borgescomercial.com/produto/arroz-5kg</loc>
-    <lastmod>2026-02-23</lastmod>
+    <lastmod>2026-02-25</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
     <image:image>
-      <image:loc>https://uufmcdssvghyufufpoku.supabase.co/storage/v1/object/public/product-images/1771798558478.jpeg</image:loc>
-      <image:title>Arroz 5kg</image:title>
+      <image:loc>https://uufmcdssvghyufufpoku.supabase.co/storage/v1/object/public/product-images/1771864920983.jpeg</image:loc>
+      <image:title>Arroz 25kg</image:title>
     </image:image>
   </url>
   <url>
-    <loc>https://www.borgescomercial.com/produto/champo-400ml</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://www.borgescomercial.com/produto/pasta-dentes-100ml</loc>
+    <lastmod>2026-02-25</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
     <image:image>
-      <image:loc>https://uufmcdssvghyufufpoku.supabase.co/storage/v1/object/public/product-images/1771798578717.jpeg</image:loc>
-      <image:title>Champô 400ml</image:title>
+      <image:loc>https://uufmcdssvghyufufpoku.supabase.co/storage/v1/object/public/product-images/1771861019963.jpeg</image:loc>
+      <image:title>Aquafresh</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.borgescomercial.com/produto/sabao-po-1kg</loc>
+    <lastmod>2026-02-25</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://uufmcdssvghyufufpoku.supabase.co/storage/v1/object/public/product-images/1771862167817.jpg</image:loc>
+      <image:title>Maq 2kg </image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.borgescomercial.com/produto/acucar-1kg</loc>
+    <lastmod>2026-02-25</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://uufmcdssvghyufufpoku.supabase.co/storage/v1/object/public/product-images/1771850528349.jpg</image:loc>
+      <image:title>Açúcar autopack 1kg</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.borgescomercial.com/produto/cremora-750g</loc>
+    <lastmod>2026-02-25</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://uufmcdssvghyufufpoku.supabase.co/storage/v1/object/public/product-images/1771878201997.jpg</image:loc>
+      <image:title>Cremora  750g</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.borgescomercial.com/produto/papel-higienico-pack-4</loc>
+    <lastmod>2026-02-25</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://uufmcdssvghyufufpoku.supabase.co/storage/v1/object/public/product-images/1771862772601.jpg</image:loc>
+      <image:title>Papel Higiénico Pack 10 rolos</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.borgescomercial.com/produto/fraldas-pack</loc>
+    <lastmod>2026-02-25</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://uufmcdssvghyufufpoku.supabase.co/storage/v1/object/public/product-images/1771861056319.jpeg</image:loc>
+      <image:title>kisskids</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.borgescomercial.com/produto/Top drinks sumo com de maçã com leite</loc>
+    <lastmod>2026-02-25</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://uufmcdssvghyufufpoku.supabase.co/storage/v1/object/public/product-images/1771851929489.jpg</image:loc>
+      <image:title>Top drinks</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.borgescomercial.com/produto/massa-cotovelo</loc>
+    <lastmod>2026-02-25</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://uufmcdssvghyufufpoku.supabase.co/storage/v1/object/public/product-images/1771852124916.jpg</image:loc>
+      <image:title>Massa-cotovelo </image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.borgescomercial.com/produto/ricoff-400g</loc>
+    <lastmod>2026-02-25</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://uufmcdssvghyufufpoku.supabase.co/storage/v1/object/public/product-images/1771878242014.webp</image:loc>
+      <image:title>Ricoff 400g</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.borgescomercial.com/produto/softcare-fraldas</loc>
+    <lastmod>2026-02-25</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://uufmcdssvghyufufpoku.supabase.co/storage/v1/object/public/product-images/1771851031446.jpg</image:loc>
+      <image:title>Softcare Fraldas </image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.borgescomercial.com/produto/sumo-laranja-1l</loc>
+    <lastmod>2026-02-25</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://uufmcdssvghyufufpoku.supabase.co/storage/v1/object/public/product-images/1771863139128.jpeg</image:loc>
+      <image:title>Sumo Compal</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.borgescomercial.com/produto/farinha-trigo-1kg</loc>
+    <lastmod>2026-02-25</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://uufmcdssvghyufufpoku.supabase.co/storage/v1/object/public/product-images/1771861134105.jpg</image:loc>
+      <image:title>Farinha de Trigo 1kg</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.borgescomercial.com/produto/refrigerante-cola-2l</loc>
+    <lastmod>2026-02-25</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://uufmcdssvghyufufpoku.supabase.co/storage/v1/object/public/product-images/1771863021055.jpeg</image:loc>
+      <image:title>Refrigerante 2L</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.borgescomercial.com/produto/oleo-vegetal-1l</loc>
+    <lastmod>2026-02-25</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://uufmcdssvghyufufpoku.supabase.co/storage/v1/object/public/product-images/1771863301344.jpeg</image:loc>
+      <image:title>Óleo Vegetal 1L</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.borgescomercial.com/produto/Hand hand 750ml</loc>
+    <lastmod>2026-02-25</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://uufmcdssvghyufufpoku.supabase.co/storage/v1/object/public/product-images/1771863455794.jpeg</image:loc>
+      <image:title>Hand hand</image:title>
     </image:image>
   </url>
   <url>
     <loc>https://www.borgescomercial.com/produto/detergente-loica-500ml</loc>
-    <lastmod>2026-02-23</lastmod>
+    <lastmod>2026-02-25</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
     <image:image>
-      <image:loc>https://uufmcdssvghyufufpoku.supabase.co/storage/v1/object/public/product-images/1771798606005.jpeg</image:loc>
-      <image:title>Detergente para Loiça 500ml</image:title>
+      <image:loc>https://uufmcdssvghyufufpoku.supabase.co/storage/v1/object/public/product-images/1771863788346.jpeg</image:loc>
+      <image:title>Detergente para Loiça 750ml</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.borgescomercial.com/produto/vinagre-top-2l</loc>
+    <lastmod>2026-02-25</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://uufmcdssvghyufufpoku.supabase.co/storage/v1/object/public/product-images/1771880724779.jpg</image:loc>
+      <image:title>Vinagre top 2L</image:title>
     </image:image>
   </url>
 </urlset>

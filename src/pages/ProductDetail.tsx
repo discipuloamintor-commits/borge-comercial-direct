@@ -183,7 +183,7 @@ const ProductDetail = () => {
                 className="flex items-center justify-center gap-2 w-full h-14 rounded-lg bg-primary text-primary-foreground font-bold text-base hover:bg-accent transition-colors shadow-premium"
               >
                 <CheckCircle className="h-5 w-5" />
-                Adicionar e Encomendar
+                {product.sales_type === 'unidade' ? 'Adicionar (Unidade)' : product.sales_type === 'ambos' ? 'Adicionar e Encomendar' : 'Adicionar (Grosso)'}
               </Link>
             </div>
           </div>
