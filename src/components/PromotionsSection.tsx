@@ -1,10 +1,13 @@
 import { Link } from "react-router-dom";
 import { Tag, ArrowRight, Zap } from "lucide-react";
-import { products, formatPrice } from "@/data/products";
+import { formatPrice } from "@/data/products";
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const PromotionsSection = () => {
-    const discounted = products.filter(p => p.originalPrice);
+    // No originalPrice field exists in the database, so this section won't render for now
+    const discounted: any[] = [];
     const { ref, isVisible } = useScrollAnimation();
 
     if (discounted.length === 0) return null;
