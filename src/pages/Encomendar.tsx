@@ -27,6 +27,7 @@ const Encomendar = () => {
     const [deliveryDate, setDeliveryDate] = useState("");
     const [deliveryPeriod, setDeliveryPeriod] = useState("manha");
     const [notes, setNotes] = useState("");
+    const [selectedTypes, setSelectedTypes] = useState<Record<string, 'grosso' | 'unidade'>>({});
 
     const { ref: heroRef, isVisible: heroVisible } = useScrollAnimation();
     const { ref: formRef, isVisible: formVisible } = useScrollAnimation();
@@ -86,7 +87,8 @@ const Encomendar = () => {
     const totalPrice = orderItems.reduce((sum, item) => {
         const product = products.find(p => p.id === item.productId);
         if (!product) return sum;
-        return sum + (product.price * item.quantity);
+        const price = item.saleType === 'unidade' ? (product.price_unit || 0) : product.price;
+        return sum + (price * item.quantity);
     }, 0);
 
     const totalItemsCount = orderItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -149,8 +151,9 @@ const Encomendar = () => {
             const product = products.find(p => p.id === item.productId);
             if (product) {
                 const typeLabel = item.saleType === 'unidade' ? " (Unidade)" : " (Grosso)";
+                const price = item.saleType === 'unidade' ? (product.price_unit || 0) : product.price;
                 lines.push(`${index + 1}. ${product.name}${typeLabel}`);
-                lines.push(`   Qtd: ${item.quantity} × ${formatPrice(product.price)} = *${formatPrice(product.price * item.quantity)}*`);
+                lines.push(`   Qtd: ${item.quantity} × ${formatPrice(price)} = *${formatPrice(price * item.quantity)}*`);
             }
         });
 
@@ -256,9 +259,14 @@ const Encomendar = () => {
                             ) : (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     {filteredProducts.map((product: any) => {
+                                        const defaultType = product.sales_type === 'unidade' ? 'unidade' : 'grosso';
+                                        const currentSaleType = product.sales_type === 'ambos' ? (selectedTypes[product.id] || 'grosso') : defaultType;
+
                                         const qtyGrosso = getItemQuantity(product.id, 'grosso');
                                         const qtyUnidade = getItemQuantity(product.id, 'unidade');
                                         const totalQty = qtyGrosso + qtyUnidade;
+                                        const currentQty = currentSaleType === 'grosso' ? qtyGrosso : qtyUnidade;
+                                        const priceToDisplay = currentSaleType === 'unidade' ? (product.price_unit || 0) : product.price;
 
                                         return (
                                             <div
@@ -270,9 +278,27 @@ const Encomendar = () => {
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className="font-semibold text-sm text-foreground truncate">{product.name}</p>
-                                                    <p className="text-sm font-bold text-primary mt-0.5">
-                                                        {formatPrice(product.price)}
-                                                    </p>
+                                                    <div className="flex flex-wrap items-center gap-2 mt-0.5">
+                                                        <p className="text-sm font-bold text-primary">
+                                                            {formatPrice(priceToDisplay)}
+                                                        </p>
+                                                        {product.sales_type === 'ambos' && (
+                                                            <select
+                                                                className="text-xs border border-input bg-background rounded px-1.5 py-0.5 outline-none focus:ring-1 focus:ring-primary/50 text-muted-foreground"
+                                                                value={currentSaleType}
+                                                                onChange={(e) => setSelectedTypes(prev => ({ ...prev, [product.id]: e.target.value as 'grosso' | 'unidade' }))}
+                                                            >
+                                                                <option value="grosso">Grosso</option>
+                                                                <option value="unidade">Unidade</option>
+                                                            </select>
+                                                        )}
+                                                        {product.sales_type === 'unidade' && (
+                                                            <span className="text-[10px] px-1.5 py-0.5 bg-secondary/50 rounded-md text-muted-foreground uppercase font-bold tracking-wider">Unidade</span>
+                                                        )}
+                                                        {product.sales_type === 'grosso' && (
+                                                            <span className="text-[10px] px-1.5 py-0.5 bg-secondary/50 rounded-md text-muted-foreground uppercase font-bold tracking-wider">Grosso</span>
+                                                        )}
+                                                    </div>
                                                     {product.available ? (
                                                         <p className="text-[10px] text-green-600 font-bold uppercase tracking-wider mt-1">Em Estoque</p>
                                                     ) : (
@@ -281,13 +307,13 @@ const Encomendar = () => {
                                                 </div>
                                                 <div className="flex flex-col gap-2 items-end">
                                                     <div className="flex items-center gap-1.5" title="Adicionar">
-                                                        {qtyGrosso > 0 && (
-                                                            <button onClick={() => updateItem(product.id, -1, 'grosso')} className="w-7 h-7 rounded-md border border-primary/30 text-primary flex items-center justify-center bg-white hover:bg-primary/10 transition-colors">
+                                                        {currentQty > 0 && (
+                                                            <button onClick={() => updateItem(product.id, -1, currentSaleType)} className="w-7 h-7 rounded-md border border-primary/30 text-primary flex items-center justify-center bg-white hover:bg-primary/10 transition-colors">
                                                                 <Minus className="h-3.5 w-3.5" />
                                                             </button>
                                                         )}
-                                                        {qtyGrosso > 0 && <span className="w-5 text-center font-bold text-xs text-foreground">{qtyGrosso}</span>}
-                                                        <button onClick={() => updateItem(product.id, 1, 'grosso')} disabled={!product.available} className={`w-7 h-7 rounded-md flex items-center justify-center transition-colors ${!product.available ? "bg-muted text-muted-foreground opacity-50 cursor-not-allowed" : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"}`}>
+                                                        {currentQty > 0 && <span className="w-5 text-center font-bold text-xs text-foreground">{currentQty}</span>}
+                                                        <button onClick={() => updateItem(product.id, 1, currentSaleType)} disabled={!product.available} className={`w-7 h-7 rounded-md flex items-center justify-center transition-colors ${!product.available ? "bg-muted text-muted-foreground opacity-50 cursor-not-allowed" : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"}`}>
                                                             <Plus className="h-3.5 w-3.5" />
                                                         </button>
                                                     </div>
@@ -317,12 +343,12 @@ const Encomendar = () => {
                                             {orderItems.map(item => {
                                                 const product = products.find(p => p.id === item.productId);
                                                 if (!product) return null;
-                                                const price = product.price;
-                                                const typeLabel = "";
+                                                const price = item.saleType === 'unidade' ? (product.price_unit || 0) : product.price;
+                                                const typeLabel = item.saleType === 'unidade' ? ' (Un)' : ' (Grs)';
                                                 return (
                                                     <div key={`${item.productId}-${item.saleType}`} className="flex items-center justify-between gap-2">
                                                         <div className="flex-1 min-w-0">
-                                                            <p className="text-sm font-medium text-foreground truncate">{product.name}{typeLabel}</p>
+                                                            <p className="text-sm font-medium text-foreground truncate">{product.name} <span className="text-xs text-muted-foreground font-normal">{typeLabel}</span></p>
                                                             <p className="text-xs text-muted-foreground">{item.quantity} × {formatPrice(price)}</p>
                                                         </div>
                                                         <p className="text-sm font-bold text-foreground whitespace-nowrap">{formatPrice(price * item.quantity)}</p>
