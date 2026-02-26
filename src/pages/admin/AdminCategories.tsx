@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 
@@ -92,6 +92,7 @@ export default function AdminCategories() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>{editId ? "Editar Categoria" : "Nova Categoria"}</DialogTitle>
+              <DialogDescription>Preencha os dados da categoria abaixo.</DialogDescription>
             </DialogHeader>
             <form
               onSubmit={(e) => { e.preventDefault(); saveMutation.mutate(); }}

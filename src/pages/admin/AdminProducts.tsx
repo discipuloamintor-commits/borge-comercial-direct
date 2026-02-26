@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "@/hooks/use-toast";
 import { Plus, Pencil, Trash2 } from "lucide-react";
@@ -181,6 +181,7 @@ export default function AdminProducts() {
             <DialogContent className="max-h-[90vh] overflow-y-auto max-w-lg">
               <DialogHeader>
                 <DialogTitle>{editId ? "Editar Produto" : "Novo Produto"}</DialogTitle>
+                <DialogDescription>Preencha os dados do produto abaixo.</DialogDescription>
               </DialogHeader>
               <form onSubmit={(e) => { e.preventDefault(); saveMutation.mutate(); }} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
